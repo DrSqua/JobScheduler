@@ -19,4 +19,4 @@ class LinearJobScheduler:
         actionCount = distParam.get_total_actions()
         linearEmptySchedule = generate_calender_totalactionbase(endDate=endDate, actionCount=actionCount, startDate=startDate)
 
-        return zip(linearEmptySchedule, sample(self.personList, len(self.personList)))
+        return zip(linearEmptySchedule, sample(self.personList, len(self.personList)), [task]*len(linearEmptySchedule))

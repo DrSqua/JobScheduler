@@ -37,6 +37,6 @@ if __name__ == '__main__':
     saved_time.append(time.time())
     print(f"Done! {saved_time[-1] - saved_time[-2]}")
 
-    for date, person in schedule:
-        print(f"{date} ----> {person}")
+    for date, person, task in schedule:
+        print(f"{date} ----> {person} <--- {task}")
     print("Finished running algorithm!" + "\n" * 2)
