@@ -1,13 +1,15 @@
 import datetime
-import pandas as pd
 
 from Datatypes.Schedules.LinearSchedule import LinearSchedule
 from Datatypes.Job import Job
 from ScheduleGenerators.ScheduleGenerator import ScheduleGenerator
 
+from ScheduleGenerators.DateRangeGeneratorFunctions.DateRangeGeneratorFunctions import generate_from_total_actions, generate_from_unbound_frequency, generate_from_bound_frequency
+
 
 class LinearScheduleGenerator(ScheduleGenerator):
     """LinearScheduleGenerator"""
+
     def __init__(self, job: Job):
         self.job = job
 
@@ -15,45 +17,47 @@ class LinearScheduleGenerator(ScheduleGenerator):
                                    endDate: datetime.date,
                                    actionCount: int,
                                    startDate: datetime.date = datetime.datetime.today().date(),
-                                   fitToEnd: bool = True) -> LinearSchedule:
-        dateRange = generate_calender_totalactionbase(endDate, actionCount, startDate, fitToEnd)
+                                   fitToEndDate: bool = True) -> LinearSchedule:
+        """
+        Creates schedule using a range of dates, fitted to a set interval which fits in the given date range
+        :param actionCount: A 'action' occurs when the job is preformed by a person
+        :param endDate: proposed endDate
+        :param startDate: proposed startDate
+        :param fitToEndDate: The dateRange is possibly concattenated to fit the required count
+               This parameter defines which of the supplied dates should always be included in the final dateRange
+        :return:
+        """
+        return LinearSchedule.from_empty(self.job, generate_from_total_actions(endDate, actionCount, startDate, fitToEndDate))
 
-        return LinearSchedule.from_empty(self.job, tuple(dateRange))
+    def generate_from_bound_frequency(self,
+                                      endDate: datetime.date,
+                                      actionFrequency: int,
+                                      startDate: datetime.date = datetime.datetime.today().date(),
+                                      fitToEndDate: bool = True
+                                      ):
+        """
+        Creates schedule using a range of dates, fitted to a set interval which fits in the given date range
+        :param endDate:
+        :param actionFrequency:
+        :param startDate:
+        :param fitToEndDate:
+        :return:
+        """
+        return LinearSchedule.from_empty(self.job, generate_from_bound_frequency(endDate, actionFrequency, startDate, fitToEndDate))
 
-
-def generate_calender_totalactionbase(endDate: datetime.date,
-                                      actionCount: int,
-                                      startDate: datetime.date = datetime.date.today(),
-                                      fitToEndDate: bool = True) -> list[datetime.date]:
-    """
-    Returns a range of dates, fitted to a set interval which fits in the given date range
-
-    :param actionCount: A 'action' occurs when the job is preformed by a person.
-    :param endDate:
-    :param startDate:
-    :param fitToEndDate:
-    :return:
-    """
-    if endDate <= startDate:
-        raise AttributeError("endDate can not be smaller or equal to startDate")
-
-    rawTimeRange: int = (endDate - startDate).days  # Excluding the endDate (is left out of equations)
-
-    if rawTimeRange < actionCount:
-        raise AttributeError("rawTimeRange can not be smaller than totalActions")
-
-    dateOffset = rawTimeRange % (actionCount-1)  # We must divide the time range we have in actionCount-1 parts
-    fittedTimeRange = rawTimeRange - dateOffset  # Setting a fitting range
-    actionFrequency = fittedTimeRange // (actionCount-1)  # Calculating the required frequency
-
-    if fitToEndDate:
-        fittedStartDate = startDate + datetime.timedelta(days=dateOffset)
-        fittedEndDate = endDate
-    else:
-        fittedStartDate = startDate
-        fittedEndDate = endDate - datetime.timedelta(days=dateOffset)
-
-    dateRange = pd.date_range(fittedStartDate,
-                              fittedEndDate,
-                              freq=f"{actionFrequency}D")
-    return [date.date() for date in dateRange]
+    def generate_from_unbound_frequency(self,
+                                        beginDate: datetime.date,
+                                        actionCount: int,
+                                        actionFrequency: int,
+                                        fitAsEndDate: bool = False
+                                        ):
+        """
+        Creates schedule using a range of dates, fitted to a beginDate and endDate,
+        the latter which is defined by amount of actions a frequency
+        :param beginDate: Date from where the range will start/end counting
+        :param actionCount: How many times the frequency will be called
+        :param actionFrequency: How many days between the different actions
+        :param fitAsEndDate: If 'beginDate' is to be treated as the endDate of the date range
+        :return:
+        """
+        return LinearSchedule.from_empty(self.job, generate_from_unbound_frequency(beginDate, actionCount, actionFrequency, fitAsEndDate))

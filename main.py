@@ -8,6 +8,8 @@ from ImportExport.read_person_list import read_person_list
 from ScheduleGenerators.LinearScheduleGenerator import LinearScheduleGenerator
 from JobScheduler.LinearJobScheduler import LinearJobScheduler
 
+from ImportExport.ScheduleExporters.ScheduleToTxt import ScheduleToText
+
 if __name__ == '__main__':
     """
     Basic format for using the spamcalender generator
@@ -19,7 +21,7 @@ if __name__ == '__main__':
     job = Job("Delen op socials")
 
     dateStart = datetime.datetime(2023, 1, 25)
-    dateEnd = datetime.datetime(2023, 3, 24)
+    dateEnd = datetime.datetime(2023, 3, 23)
 
     print("    Setting up generator ... ", end="")
     generator = LinearScheduleGenerator(job=job)
@@ -47,3 +49,6 @@ if __name__ == '__main__':
 
     print("\n" + "Resulted in this return")
     print(filledSchedule)
+
+    ScheduleToText.schedule_to_txt(filledSchedule, "scheduleOutput.txt")
+
