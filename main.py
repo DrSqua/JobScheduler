@@ -2,7 +2,7 @@ import time
 import datetime
 
 from Datatypes.Person import Person
-from Datatypes.Task import Task
+from Datatypes.Job import Job
 from ImportExport.read_person_list import read_person_list
 
 from ScheduleGenerators.LinearScheduleGenerator import LinearScheduleGenerator
@@ -16,13 +16,13 @@ if __name__ == '__main__':
 
     print("Setting up variables ...")
     personList: list[Person] = read_person_list("ImportExport/PraesidiumNamenlijst.txt")
-    task = Task("Delen op socials")
+    job = Job("Delen op socials")
 
     dateStart = datetime.datetime(2023, 1, 25)
     dateEnd = datetime.datetime(2023, 3, 24)
 
     print("    Setting up generator ... ", end="")
-    generator = LinearScheduleGenerator(task=task)
+    generator = LinearScheduleGenerator(job=job)
 
     print("Done!")
     print("Finished setup!" + "\n"*2)
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     print(f"Done! {saved_time[-1] - saved_time[-2]}")
     print(emptySchedule)
 
-    print(f"Generating and running scheduler ...")
+    print(f"Setting up and running scheduler ...")
     scheduler = LinearJobScheduler(personList, emptySchedule)
     filledSchedule = scheduler.fill_schedule()
     saved_time.append(time.time())
@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     print("Ran generator with paramaters:")
     print("Personlist: " + str(personList))
-    print("Task: " + str(task))
+    print("Job: " + str(job))
 
     print("\n" + "Resulted in this return")
     print(filledSchedule)

@@ -3,24 +3,24 @@ from typing import Union
 import datetime
 
 from Datatypes.Schedules.Schedule import Schedule
-from Datatypes.Task import Task
+from Datatypes.Job import Job
 from Datatypes.Person import Person
 
 
 class LinearSchedule(Schedule):
     """
     A linear scheduler (one column)
-    with only one task at maximum.
+    with only one Job at maximum.
     """
-    def __init__(self, task: Task,
+    def __init__(self, Job: Job,
                  slotDates: tuple[datetime.date],
                  scheduleSlots: list[Union[None, Person]]):
         super().__init__(scheduleSlots)
-        self.task: Task = task
+        self.Job: Job = Job
         self.slotDates: tuple[datetime.date] = slotDates
 
     def __str__(self):
-        print("-"*44 + "\n           | {}\n".format(self.task.taskName) + "-"*44)
+        print("-"*44 + "\n           | {}\n".format(self.Job.JobName) + "-"*44)
         for slotDate, slot in zip(self.slotDates, self.scheduleSlots):
             if not slot:
                 print("|{}| {:30}|".format(slotDate, "None"))
@@ -29,12 +29,12 @@ class LinearSchedule(Schedule):
         return ""  # TODO This is a bad way to make the function work"
 
     @classmethod
-    def from_empty(cls, task: Task, slotDates: tuple[datetime.date]) -> LinearSchedule:
-        return cls(task, slotDates, [None]*len(slotDates))
+    def from_empty(cls, Job: Job, slotDates: tuple[datetime.date]) -> LinearSchedule:
+        return cls(Job, slotDates, [None]*len(slotDates))
 
     @classmethod
-    def from_slots(cls, task: Task, slotDates: tuple[datetime.date], scheduleSlots: list[Union[None, Person]]):
-        return cls(task, slotDates, scheduleSlots)
+    def from_slots(cls, Job: Job, slotDates: tuple[datetime.date], scheduleSlots: list[Union[None, Person]]):
+        return cls(Job, slotDates, scheduleSlots)
 
     def is_validSlotIndex(self, slotIndex: int) -> bool:
         return slotIndex < 0 | len(self.slotDates) < slotIndex

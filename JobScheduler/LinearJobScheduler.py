@@ -2,7 +2,6 @@ import datetime
 from random import sample
 from copy import deepcopy
 
-from Datatypes.Task import Task
 from Datatypes.Person import Person
 from Datatypes.Schedules.LinearSchedule import LinearSchedule
 

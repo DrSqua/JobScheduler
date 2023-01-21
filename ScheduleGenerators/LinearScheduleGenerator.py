@@ -2,14 +2,14 @@ import datetime
 import pandas as pd
 
 from Datatypes.Schedules.LinearSchedule import LinearSchedule
-from Datatypes.Task import Task
+from Datatypes.Job import Job
 from ScheduleGenerators.ScheduleGenerator import ScheduleGenerator
 
 
 class LinearScheduleGenerator(ScheduleGenerator):
     """LinearScheduleGenerator"""
-    def __init__(self, task: Task):
-        self.task = task
+    def __init__(self, job: Job):
+        self.job = job
 
     def generate_from_totalActions(self,
                                    endDate: datetime.date,
@@ -18,7 +18,7 @@ class LinearScheduleGenerator(ScheduleGenerator):
                                    fitToEnd: bool = True) -> LinearSchedule:
         dateRange = generate_calender_totalactionbase(endDate, actionCount, startDate, fitToEnd)
 
-        return LinearSchedule.from_empty(self.task, tuple(dateRange))
+        return LinearSchedule.from_empty(self.job, tuple(dateRange))
 
 
 def generate_calender_totalactionbase(endDate: datetime.date,
