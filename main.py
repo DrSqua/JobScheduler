@@ -3,9 +3,10 @@ import datetime
 
 from Datatypes.Person import Person
 from Datatypes.Task import Task
+from ImportExport.read_person_list import read_person_list
 
-from LinearJobScheduler.LinearJobScheduler import LinearJobScheduler
-from Datatypes.DistributionParemeters import LinearDistributionParameters
+from ScheduleGenerators.LinearScheduleGenerator import LinearScheduleGenerator
+from JobScheduler.LinearJobScheduler import LinearJobScheduler
 
 if __name__ == '__main__':
     """
@@ -14,29 +15,35 @@ if __name__ == '__main__':
     saved_time: list = [time.time()]
 
     print("Setting up variables ...")
-    personList: list[Person] = [Person("P1"), Person("P2"), Person("P3"), Person("P4"), Person("P5")]
-    task = Task("Op Facebook delen")
+    personList: list[Person] = read_person_list("ImportExport/PraesidiumNamenlijst.txt")
+    task = Task("Delen op socials", 2)
 
-    dateStart = datetime.datetime(2023, 1, 10)
-    dateEnd = datetime.datetime(2023, 1, 20)
-
-    linearParameters = LinearDistributionParameters.from_actionperperson(len(personList), 1)
+    dateStart = datetime.datetime(2023, 1, 8)
+    dateEnd = datetime.datetime(2023, 1, 30)
 
     print("    Setting up generator ... ", end="")
-    generator = LinearJobScheduler(personList)
-    print("Done!")
+    generator = LinearScheduleGenerator(task=task)
 
+    print("Done!")
     print("Finished setup!" + "\n"*2)
 
     print(f"Running generator ...")
+    emptySchedule = generator.generate_schedule(dateEnd, 5, dateStart)
+    saved_time.append(time.time())
+    print(f"Done! {saved_time[-1] - saved_time[-2]}")
+    print(emptySchedule)
 
-    schedule = generator.schedule_single_task(endDate=dateEnd, startDate=dateStart,
-                                              task=task,
-                                              distParam=linearParameters)
-
+    print(f"Generating and running scheduler ...")
+    scheduler = LinearJobScheduler(personList, emptySchedule)
+    filledSchedule = scheduler.fill_schedule()
     saved_time.append(time.time())
     print(f"Done! {saved_time[-1] - saved_time[-2]}")
 
-    for date, person, task in schedule:
-        print(f"{date} ----> {person} <--- {task}")
     print("Finished running algorithm!" + "\n" * 2)
+
+    print("Ran generator with paramaters:")
+    print("Personlist: " + str(personList))
+    print("Task: " + str(task))
+
+    print("\n" + "Resulted in this return")
+    print(filledSchedule)
