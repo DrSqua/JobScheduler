@@ -1,8 +1,9 @@
 from typing import Union
 
+from Datatypes.Schedules.Schedule import Schedule
 from Datatypes.Person import Person
 
 
-class Schedule:
+class MultiSchedule(Schedule):
     def __init__(self, scheduleSlots: list[Union[None, Person]]):
-        self.scheduleSlots: list[Union[None, Person]] = scheduleSlots
+        super().__init__(scheduleSlots)

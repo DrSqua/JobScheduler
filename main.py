@@ -16,10 +16,10 @@ if __name__ == '__main__':
 
     print("Setting up variables ...")
     personList: list[Person] = read_person_list("ImportExport/PraesidiumNamenlijst.txt")
-    task = Task("Delen op socials", 2)
+    task = Task("Delen op socials")
 
-    dateStart = datetime.datetime(2023, 1, 8)
-    dateEnd = datetime.datetime(2023, 1, 30)
+    dateStart = datetime.datetime(2023, 1, 25)
+    dateEnd = datetime.datetime(2023, 3, 24)
 
     print("    Setting up generator ... ", end="")
     generator = LinearScheduleGenerator(task=task)
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     print("Finished setup!" + "\n"*2)
 
     print(f"Running generator ...")
-    emptySchedule = generator.generate_schedule(dateEnd, 5, dateStart)
+    emptySchedule = generator.generate_from_totalActions(dateEnd, len(personList), dateStart)
     saved_time.append(time.time())
     print(f"Done! {saved_time[-1] - saved_time[-2]}")
     print(emptySchedule)

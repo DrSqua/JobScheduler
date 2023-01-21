@@ -11,24 +11,27 @@ class LinearScheduleGenerator(ScheduleGenerator):
     def __init__(self, task: Task):
         self.task = task
 
-    def generate_schedule(self,
-                          endDate: datetime.date,
-                          actionCount: int,
-                          startDate: datetime.date = datetime.date.today()) -> LinearSchedule:
-        date_range = generate_calender_totalactionbase(endDate, actionCount, startDate)
+    def generate_from_totalActions(self,
+                                   endDate: datetime.date,
+                                   actionCount: int,
+                                   startDate: datetime.date = datetime.datetime.today().date(),
+                                   fitToEnd: bool = True) -> LinearSchedule:
+        dateRange = generate_calender_totalactionbase(endDate, actionCount, startDate, fitToEnd)
 
-        return LinearSchedule.from_empty(self.task, tuple(date_range))
+        return LinearSchedule.from_empty(self.task, tuple(dateRange))
 
 
 def generate_calender_totalactionbase(endDate: datetime.date,
                                       actionCount: int,
-                                      startDate: datetime.date = datetime.date.today()) -> list[datetime.date]:
+                                      startDate: datetime.date = datetime.date.today(),
+                                      fitToEndDate: bool = True) -> list[datetime.date]:
     """
     Returns a range of dates, fitted to a set interval which fits in the given date range
 
     :param actionCount: A 'action' occurs when the job is preformed by a person.
     :param endDate:
     :param startDate:
+    :param fitToEndDate:
     :return:
     """
     if endDate <= startDate:
@@ -43,10 +46,14 @@ def generate_calender_totalactionbase(endDate: datetime.date,
     fittedTimeRange = rawTimeRange - dateOffset  # Setting a fitting range
     actionFrequency = fittedTimeRange // (actionCount-1)  # Calculating the required frequency
 
-    fittedStartDate = startDate + datetime.timedelta(days=dateOffset)
+    if fitToEndDate:
+        fittedStartDate = startDate + datetime.timedelta(days=dateOffset)
+        fittedEndDate = endDate
+    else:
+        fittedStartDate = startDate
+        fittedEndDate = endDate - datetime.timedelta(days=dateOffset)
+
     dateRange = pd.date_range(fittedStartDate,
-                              endDate,
+                              fittedEndDate,
                               freq=f"{actionFrequency}D")
-    temp = [date.date() for date in dateRange]
-    print(temp)
-    return temp
+    return [date.date() for date in dateRange]
