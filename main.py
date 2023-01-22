@@ -6,7 +6,7 @@ from Datatypes.Job import Job
 from ImportExport.read_person_list import read_person_list
 
 from ScheduleGenerators.LinearScheduleGenerator import LinearScheduleGenerator
-from JobScheduler.LinearJobScheduler import LinearJobScheduler
+from JobScheduler.LinearRandomJobScheduler import LinearRandomJobScheduler
 
 from ImportExport.ScheduleExporters.ScheduleToTxt import ScheduleToText
 
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     print(emptySchedule)
 
     print(f"Setting up and running scheduler ...")
-    scheduler = LinearJobScheduler(emptySchedule)
+    scheduler = LinearRandomJobScheduler(emptySchedule)
     filledSchedule = scheduler.fill_schedule()
     saved_time.append(time.time())
     print(f"Done! {saved_time[-1] - saved_time[-2]}")

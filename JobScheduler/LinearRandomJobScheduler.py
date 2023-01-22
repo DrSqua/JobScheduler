@@ -1,15 +1,16 @@
 from random import sample
 from copy import deepcopy
 
+from JobScheduler.JobSchedulingAgent import JobSchedulingAgent
 from Datatypes.Schedules.LinearSchedule import LinearSchedule
 
 
-class LinearJobScheduler:
+class LinearRandomJobScheduler(JobSchedulingAgent):
     def __init__(self, startingSchedule: LinearSchedule):
+        super().__init__(startingSchedule)
         self.personVector = startingSchedule.get_personVector()
-        self.schedule: LinearSchedule = startingSchedule
 
-    def fill_schedule(self):
+    def fill_schedule(self, checkAvailability: bool = False):
         randomPersonOrder = sample(self.personVector, self.schedule.get_slotCount())
         filledSchedule: LinearSchedule = deepcopy(self.schedule)
 
