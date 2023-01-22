@@ -17,14 +17,14 @@ if __name__ == '__main__':
     saved_time: list = [time.time()]
 
     print("Setting up variables ...")
-    personList: list[Person] = read_person_list("ImportExport/PraesidiumNamenlijst.txt")
+    personList: tuple[Person] = read_person_list("ImportExport/PraesidiumNamenlijst.txt")
     job = Job("Delen op socials")
 
     dateStart = datetime.datetime(2023, 1, 25)
     dateEnd = datetime.datetime(2023, 3, 23)
 
     print("    Setting up generator ... ", end="")
-    generator = LinearScheduleGenerator(job=job)
+    generator = LinearScheduleGenerator(personVector=personList,job=job)
 
     print("Done!")
     print("Finished setup!" + "\n"*2)

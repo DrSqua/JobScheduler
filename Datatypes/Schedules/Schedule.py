@@ -9,8 +9,26 @@ class Schedule(ABC):
         self.personVector: tuple[Person] = personVector
         self.scheduleSlots: list[int] = scheduleSlots
 
-    def to_person(self, personIndex: int):
-        if personIndex < 0 or personIndex < len(self.personVector):
-            raise ValueError("personIndex must be equal or higher than 0 and smaller than personVector length")
+    def add_person(self, person) -> None:
+        """
+        Adds a new person to the personVector
+        Method to be avoided as it reinitializes the tuple
+        :param person:
+        :return: None
+        """
+        if person not in self.personVector:
+            self.personVector += person
 
-    def to_personIndex(self, person: Person):
+    def as_person(self, personIndex: int) -> Union[None, Person]:
+        if personIndex == -1:
+            return None
+        if personIndex < 0 or len(self.personVector) < personIndex:
+            raise ValueError("personIndex must be equal or higher than 0 and smaller than personVector length")
+        return self.personVector[personIndex]
+
+    def as_personIndex(self, person: Person) -> int:
+        if not person:
+            return -1
+        if person not in self.personVector:
+            raise ValueError("First add a Person with add_person() before getting the ID")
+        return self.personVector.index(person)

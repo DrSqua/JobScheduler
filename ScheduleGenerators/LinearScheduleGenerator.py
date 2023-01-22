@@ -2,16 +2,19 @@ import datetime
 
 from Datatypes.Schedules.LinearSchedule import LinearSchedule
 from Datatypes.Job import Job
+from Datatypes.Person import Person
 from ScheduleGenerators.ScheduleGenerator import ScheduleGenerator
 
-from ScheduleGenerators.DateRangeGeneratorFunctions.DateRangeGeneratorFunctions import generate_from_total_actions, generate_from_unbound_frequency, generate_from_bound_frequency
+from ScheduleGenerators.DateRangeGeneratorFunctions.DateRangeGeneratorFunctions import \
+    generate_from_total_actions, generate_from_unbound_frequency, generate_from_bound_frequency
 
 
 class LinearScheduleGenerator(ScheduleGenerator):
     """LinearScheduleGenerator"""
 
-    def __init__(self, job: Job):
+    def __init__(self, personVector: tuple[Person], job: Job):
         self.job = job
+        self.personVector = personVector
 
     def generate_from_totalActions(self,
                                    endDate: datetime.date,
@@ -27,7 +30,9 @@ class LinearScheduleGenerator(ScheduleGenerator):
                This parameter defines which of the supplied dates should always be included in the final dateRange
         :return:
         """
-        return LinearSchedule.from_empty(self.job, generate_from_total_actions(endDate, actionCount, startDate, fitToEndDate))
+        return LinearSchedule.from_empty(personVector=self.personVector, job=self.job,
+                                         slotDates=generate_from_total_actions(
+                                             endDate, actionCount, startDate, fitToEndDate))
 
     def generate_from_bound_frequency(self,
                                       endDate: datetime.date,
@@ -43,7 +48,9 @@ class LinearScheduleGenerator(ScheduleGenerator):
         :param fitToEndDate:
         :return:
         """
-        return LinearSchedule.from_empty(self.job, generate_from_bound_frequency(endDate, actionFrequency, startDate, fitToEndDate))
+        return LinearSchedule.from_empty(personVector=self.personVector, job=self.job,
+                                         slotDates=generate_from_bound_frequency(
+                                             endDate, actionFrequency, startDate, fitToEndDate))
 
     def generate_from_unbound_frequency(self,
                                         beginDate: datetime.date,
@@ -60,4 +67,6 @@ class LinearScheduleGenerator(ScheduleGenerator):
         :param fitAsEndDate: If 'beginDate' is to be treated as the endDate of the date range
         :return:
         """
-        return LinearSchedule.from_empty(self.job, generate_from_unbound_frequency(beginDate, actionCount, actionFrequency, fitAsEndDate))
+        return LinearSchedule.from_empty(personVector=self.personVector, job=self.job,
+                                         slotDates=generate_from_unbound_frequency(
+                                             beginDate, actionCount, actionFrequency, fitAsEndDate))
