@@ -14,17 +14,20 @@ class LinearSchedule(Schedule):
     """
     def __init__(self,
                  personVector: tuple[Person],
-                 job: Job,
-                 slotDates: tuple[datetime.date],
-                 scheduleSlots: list[int]):
-        super().__init__(personVector=personVector, scheduleSlots=scheduleSlots)
-        self.Job: Job = job
+                 slotDates: tuple[Union[datetime.datetime, datetime.date]],
+                 scheduleSlots: list[int],
+                 job: Job):
+        super().__init__(personVector=personVector, slotDates=slotDates, scheduleSlots=scheduleSlots)
+        self.job: Job = job
         self.slotDates: tuple[datetime.date] = slotDates
 
     def __str__(self):
-        print("-"*44 + "\n           | {}\n".format(self.Job.JobName) + "-"*44)
+        print("-"*44 + "\n           | {}\n".format(self.job.JobName) + "-"*44)
         for slotDate, slot in zip(self.slotDates, self.scheduleSlots):
             if slot == -1:
+                print("|{}| {:30}|".format(slotDate, "None"))
+                continue
+            if slot == -2:
                 print("|{}| {:30}|".format(slotDate, "    "))
                 continue
             print("|{}| {:30}|".format(slotDate, self.as_person(slot)))
@@ -34,7 +37,7 @@ class LinearSchedule(Schedule):
     def from_empty(cls, job: Job,
                    slotDates: tuple[datetime.date],
                    personVector: tuple[Person] = ()) -> LinearSchedule:
-        return cls(personVector=personVector, job=job, slotDates=slotDates, scheduleSlots=[0]*len(slotDates))
+        return cls(personVector=personVector, job=job, slotDates=slotDates, scheduleSlots=[-1]*len(slotDates))
 
     @classmethod
     def from_slots(cls, personVector: tuple[Person], job: Job,
@@ -57,9 +60,6 @@ class LinearSchedule(Schedule):
                 indexedScheduleSlots.append(0)
 
         return cls(personVector=personVector, job=job, slotDates=slotDates, scheduleSlots=indexedScheduleSlots)
-
-    def __add__(self, other):
-        pass
 
     def is_validSlotIndex(self, slotIndex: int) -> bool:
         return slotIndex < 0 | len(self.slotDates) < slotIndex
@@ -97,3 +97,12 @@ class LinearSchedule(Schedule):
             raise ValueError("slotIndex is required to be greater or equal to zero and smaller than size of "
                              "slotDate tuple")
         self.scheduleSlots[slotIndex] = self.as_personIndex(slotValue)
+
+
+"""     Method which should be added, need to work around the circular import problem
+        def __add__(self, other: Union[LinearSchedule, MultiSchedule]) -> MultiSchedule:
+        if isinstance(other, MultiSchedule):
+            return other + self
+        if self.personVector != other.personVector:
+            raise ValueError("TODO: Implement summation for LinearSchedule when personVectors are not equal")
+        return MultiSchedule.from_linear(self, other)"""

@@ -1,3 +1,4 @@
+import datetime
 from abc import ABC
 from typing import Union
 
@@ -5,9 +6,18 @@ from Datatypes.Person import Person
 
 
 class Schedule(ABC):
-    def __init__(self, personVector: tuple[Person], scheduleSlots: list[int]):
+    def __init__(self,
+                 personVector: tuple[Person],
+                 slotDates: tuple[Union[datetime.datetime, datetime.date]],
+                 scheduleSlots: list[int],
+                 treatAsDate=False):
+        if len(slotDates) == 0:
+            raise ValueError("No can do monsieur")
+
+        self.storedDateType: type = type(slotDates[0])
         self.personVector: tuple[Person] = personVector
         self.scheduleSlots: list[int] = scheduleSlots
+        self.slotDates: tuple[type(slotDates[0])] = slotDates
 
     def add_person(self, person) -> None:
         """
