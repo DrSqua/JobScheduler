@@ -1,13 +1,12 @@
 from random import sample
 from copy import deepcopy
 
-from Datatypes.Person import Person
 from Datatypes.Schedules.LinearSchedule import LinearSchedule
 
 
 class LinearJobScheduler:
-    def __init__(self, personVector: tuple[Person], startingSchedule):
-        self.personVector = personVector
+    def __init__(self, startingSchedule: LinearSchedule):
+        self.personVector = startingSchedule.get_personVector()
         self.schedule: LinearSchedule = startingSchedule
 
     def fill_schedule(self):

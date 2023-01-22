@@ -36,7 +36,7 @@ if __name__ == '__main__':
     print(emptySchedule)
 
     print(f"Setting up and running scheduler ...")
-    scheduler = LinearJobScheduler(personList, emptySchedule)
+    scheduler = LinearJobScheduler(emptySchedule)
     filledSchedule = scheduler.fill_schedule()
     saved_time.append(time.time())
     print(f"Done! {saved_time[-1] - saved_time[-2]}")

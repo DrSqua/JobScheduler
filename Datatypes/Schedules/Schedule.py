@@ -32,3 +32,6 @@ class Schedule(ABC):
         if person not in self.personVector:
             raise ValueError("First add a Person with add_person() before getting the ID")
         return self.personVector.index(person)
+
+    def get_personVector(self) -> tuple[Person]:
+        return self.personVector
