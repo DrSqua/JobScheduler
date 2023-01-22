@@ -51,4 +51,3 @@ if __name__ == '__main__':
     print(filledSchedule)
 
     ScheduleToText.schedule_to_txt(filledSchedule, "scheduleOutput.txt")
-
