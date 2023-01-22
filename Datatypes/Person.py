@@ -1,9 +1,12 @@
 from __future__ import annotations
+import datetime
+from Datatypes.AvailabilitySchedule import AvailabilitySchedule
 
 
 class Person:
-    def __init__(self, name: str):
+    def __init__(self, name: str, availabilitySchedule: AvailabilitySchedule = AvailabilitySchedule()):
         self.personName: str = name
+        self.availabilitySchedule: availabilitySchedule
 
     def __str__(self):
         return f"{self.personName}"
@@ -21,3 +24,6 @@ class Person:
         if self.personName == other.personName:
             return True
         return False
+
+    def is_available(self, date: datetime.datetime) -> bool:
+        return True

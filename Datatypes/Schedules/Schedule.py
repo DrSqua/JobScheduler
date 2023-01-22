@@ -9,8 +9,7 @@ class Schedule(ABC):
     def __init__(self,
                  personVector: tuple[Person],
                  slotDates: tuple[Union[datetime.datetime, datetime.date]],
-                 scheduleSlots: list[int],
-                 treatAsDate=False):
+                 scheduleSlots: list[int]):
         if len(slotDates) == 0:
             raise ValueError("No can do monsieur")
 
