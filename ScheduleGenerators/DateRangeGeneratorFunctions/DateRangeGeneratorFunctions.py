@@ -17,12 +17,12 @@ def generate_from_total_actions(endDate: datetime.date,
     :return:
     """
     if endDate <= startDate:
-        raise AttributeError("endDate can not be smaller or equal to startDate")
+        raise ValueError("endDate can not be smaller or equal to startDate")
 
     rawTimeRange: int = (endDate - startDate).days  # Excluding the endDate (is left out of equations)
 
     if rawTimeRange < actionCount:
-        raise AttributeError("rawTimeRange can not be smaller than totalActions")
+        raise ValueError("rawTimeRange can not be smaller than totalActions")
 
     dateOffset: int = rawTimeRange % (actionCount - 1)  # Divide the time range we have in actionCount-1 parts
     fittedTimeRange: int = rawTimeRange - dateOffset  # Setting a fitting range
@@ -55,7 +55,7 @@ def generate_from_bound_frequency(endDate: datetime.date,
     :return:
     """
     if endDate <= startDate:
-        raise AttributeError("endDate can not be smaller or equal to startDate")
+        raise ValueError("endDate can not be smaller or equal to startDate")
 
     rawTimeRange: int = (endDate - startDate).days  # Excluding the endDate (is left out of equations)
     dateOffset: int = rawTimeRange - (rawTimeRange % actionFrequency)

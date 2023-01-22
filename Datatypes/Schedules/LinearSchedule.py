@@ -36,6 +36,9 @@ class LinearSchedule(Schedule):
     def from_slots(cls, job: Job, slotDates: tuple[datetime.date], scheduleSlots: list[Union[None, Person]]):
         return cls(job, slotDates, scheduleSlots)
 
+    def __add__(self, other):
+        return
+
     def is_validSlotIndex(self, slotIndex: int, *args, **kwargs) -> bool:
         return slotIndex < 0 | len(self.slotDates) < slotIndex
 
@@ -47,17 +50,17 @@ class LinearSchedule(Schedule):
 
     def set_scheduleSlots(self, scheduleSlots: list[Union[None, Person]]) -> None:
         if len(self.scheduleSlots) != len(scheduleSlots):
-            raise AttributeError("instance scheduleSlots and input scheduleSlots must have the same length")
+            raise ValueError("instance scheduleSlots and input scheduleSlots must have the same length")
         self.scheduleSlots = scheduleSlots
 
     def get_slot(self, slotIndex: int) -> Union[None, Person]:
         if self.is_validSlotIndex(slotIndex):
-            raise AttributeError("slotIndex is required to be greater or equal to zero and smaller than size of "
+            raise ValueError("slotIndex is required to be greater or equal to zero and smaller than size of "
                                  "slotDate tuple")
         return self.scheduleSlots[slotIndex]
 
     def set_slot(self, slotValue: Union[None, Person], slotIndex: int):
         if self.is_validSlotIndex(slotIndex):
-            raise AttributeError("slotIndex is required to be greater or equal to zero and smaller than size of "
+            raise ValueError("slotIndex is required to be greater or equal to zero and smaller than size of "
                                  "slotDate tuple")
         self.scheduleSlots[slotIndex] = slotValue
