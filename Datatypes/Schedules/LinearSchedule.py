@@ -14,12 +14,23 @@ class LinearSchedule(Schedule):
     """
     def __init__(self,
                  personVector: tuple[Person],
+                 jobVector: Union[tuple[Job], Job],
                  slotDates: tuple[Union[datetime.datetime, datetime.date]],
-                 scheduleSlots: list[int],
-                 job: Job):
-        super().__init__(personVector=personVector, slotDates=slotDates, scheduleSlots=scheduleSlots)
-        self.job: Job = job
-        self.slotDates: tuple[datetime.date] = slotDates
+                 scheduleSlots: list[int]):
+        """
+
+        :param personVector:
+        :param jobVector:
+        :param slotDates:
+        :param scheduleSlots:
+        """
+        if isinstance(jobVector, Job):
+            self.job = jobVector
+        else:
+            if len(jobVector) != 1:
+                raise ValueError("LinearSchedule has a maximum of 1 job")
+            self.job = jobVector[0]
+        super().__init__(personVector=personVector, jobVector=tuple([self.job]), slotDates=slotDates, scheduleSlots=scheduleSlots)
 
     def __str__(self):
         print("-"*44 + "\n           | {}\n".format(self.job.JobName) + "-"*44)
@@ -37,7 +48,7 @@ class LinearSchedule(Schedule):
     def from_empty(cls, job: Job,
                    slotDates: tuple[datetime.date],
                    personVector: tuple[Person] = ()) -> LinearSchedule:
-        return cls(personVector=personVector, job=job, slotDates=slotDates, scheduleSlots=[-1]*len(slotDates))
+        return cls(personVector=personVector, jobVector=job, slotDates=slotDates, scheduleSlots=[-1]*len(slotDates))
 
     @classmethod
     def from_slots(cls, personVector: tuple[Person], job: Job,
@@ -59,7 +70,7 @@ class LinearSchedule(Schedule):
             else:
                 indexedScheduleSlots.append(0)
 
-        return cls(personVector=personVector, job=job, slotDates=slotDates, scheduleSlots=indexedScheduleSlots)
+        return cls(personVector=personVector, jobVector=job, slotDates=slotDates, scheduleSlots=indexedScheduleSlots)
 
     def is_validSlotIndex(self, slotIndex: int) -> bool:
         return slotIndex < 0 | len(self.slotDates) < slotIndex
