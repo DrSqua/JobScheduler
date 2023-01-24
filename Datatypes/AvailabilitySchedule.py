@@ -3,13 +3,30 @@ from typing import Union
 
 
 class AvailabilitySchedule:
-    def __init__(self, availableToggleDates: Union[None, list[datetime.datetime]] = None, togglesAreAvailable: bool = True):
-        if availableToggleDates is None or len(availableToggleDates) <= 1:
-            availableToggleDates = []
-        self.availabilityToggleDates: list[datetime.datetime] = sorted(availableToggleDates)
+    def __init__(self,
+                 availabilityToggleDates: Union[None, list[datetime.datetime]] = None,
+                 togglesAreAvailable: bool = True):
+        """
+        Initializer can be called with no arguments
+        availableToggleDates
+        :param availabilityToggleDates:
+        :param togglesAreAvailable:
+        """
+        if availabilityToggleDates is None or len(availabilityToggleDates) <= 1:
+            availabilityToggleDates = []
+        self.availabilityToggleDates: list[datetime.datetime] = sorted(availabilityToggleDates)
         self.togglesAreAvailable = togglesAreAvailable
 
-    def is_available(self, toCheckDate: datetime.datetime):
+    def is_toggleAreAvailable(self) -> bool:
+        return self.togglesAreAvailable
+
+    def set_togglesAreAvailable(self, togglesAreAvailable: bool) -> None:
+        self.togglesAreAvailable = togglesAreAvailable
+
+    def flip_togglesAreAvailable(self) -> None:
+        self.togglesAreAvailable = not self.togglesAreAvailable
+
+    def is_available(self, toCheckDate: datetime.datetime) -> bool:
         """
         Quite a lengthy algorithm
         First we identify two edge cases
@@ -30,9 +47,20 @@ class AvailabilitySchedule:
         dates.sort()
         toCheckDateIndex = dates.index(toCheckDate)
 
-        if toCheckDateIndex % 2 == 0:  # If the index is Even then the date is in a "Available" zone
+        if toCheckDateIndex % 2 == 1:  # If the index is Uneven then the date is in an "Available" zone
             return False
         else:
             return True
 
+    def insert_availablePeriod(self, startDate: datetime.datetime, endDate: datetime.datetime) -> None:
+        if startDate >= endDate:
+            raise ValueError("startdate cannot be greater than or equal to endDate")
 
+        if startDate in self.availabilityToggleDates or endDate in self.availabilityToggleDates:
+            raise ValueError("Method not fully implemented")
+
+        if self.is_available(startDate) and self.is_available(endDate):
+            # TODO Then insert both and create new list from begin->startDate + endDate -> end
+            pass
+        else:
+            raise ValueError("Method not fully implemented")
