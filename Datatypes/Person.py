@@ -25,5 +25,5 @@ class Person:
             return True
         return False
 
-    def is_available(self, date: datetime.datetime) -> bool:
+    def is_available(self, startDate: datetime.datetime, endDate: datetime.datetime = None) -> bool:
         return True

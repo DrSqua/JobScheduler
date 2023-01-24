@@ -8,7 +8,6 @@ from Datatypes.Schedules.LinearSchedule import LinearSchedule
 class LinearRandomJobScheduler(JobSchedulingAgent):
     def __init__(self, startingSchedule: LinearSchedule):
         super().__init__(startingSchedule)
-        self.personVector = startingSchedule.get_personVector()
 
     def fill_schedule(self, checkAvailability: bool = False):
         randomPersonOrder = sample(self.personVector, self.schedule.get_slotCount())

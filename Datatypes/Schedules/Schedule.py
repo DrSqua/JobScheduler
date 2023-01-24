@@ -1,11 +1,10 @@
 import datetime
-from abc import ABC
 from typing import Union
 
 from Datatypes.Person import Person
 
 
-class Schedule(ABC):
+class Schedule:
     def __init__(self,
                  personVector: tuple[Person],
                  slotDates: tuple[Union[datetime.datetime, datetime.date]],
@@ -15,7 +14,7 @@ class Schedule(ABC):
 
         self.storedDateType: type = type(slotDates[0])
         self.personVector: tuple[Person] = personVector
-        self.scheduleSlots: list[int] = scheduleSlots
+        self.scheduleSlots: list[int] = scheduleSlots  # -2 is not available, -1 is empty, 0->n is personIndex
         self.slotDates: tuple[type(slotDates[0])] = slotDates
 
     def add_person(self, person) -> None:
@@ -44,3 +43,16 @@ class Schedule(ABC):
 
     def get_personVector(self) -> tuple[Person]:
         return self.personVector
+
+    def set_person(self, slotIndex, personIndex):
+        self.scheduleSlots[slotIndex] = personIndex
+
+    def get_slotVector(self):
+        return self.scheduleSlots
+
+    def get_timespan_dates(self, slotIndex):
+        # TODO
+        return datetime.datetime.today(), datetime.datetime.today()
+
+    def is_filled(self) -> bool:
+        return not any(value == -1 for value in self.scheduleSlots)

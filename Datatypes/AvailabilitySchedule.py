@@ -26,9 +26,9 @@ class AvailabilitySchedule:
     def flip_togglesAreAvailable(self) -> None:
         self.togglesAreAvailable = not self.togglesAreAvailable
 
-    def is_available(self, toCheckDate: datetime.datetime) -> bool:
+    def is_date_available(self, toCheckDate: datetime.datetime):
         """
-        Quite a lengthy algorithm
+        Returns True if a single datapoint is available
         First we identify two edge cases
             The list is empty, so the whole range is available
             The date is one of our availabilityToggles, we then return the 'self.togglesAreAvailable' variable
@@ -36,11 +36,12 @@ class AvailabilitySchedule:
         To make a decision, we assert if the index is even or uneven
         If even, the date is in a 'not available' zone
         If uneven, the date is in an 'available' zone
-        :param toCheckDate:
+        :param toCheckDate: The date to be cheched
         :return:
         """
         if not self.availabilityToggleDates:
             return True
+
         if toCheckDate in self.availabilityToggleDates:
             return self.togglesAreAvailable
         dates: list[datetime.datetime] = self.availabilityToggleDates + [toCheckDate]
@@ -48,8 +49,35 @@ class AvailabilitySchedule:
         toCheckDateIndex = dates.index(toCheckDate)
 
         if toCheckDateIndex % 2 == 1:  # If the index is Uneven then the date is in an "Available" zone
-            return False
+            return False  # Uneven
         else:
+            return True  # Even
+
+    def is_available(self, startDate: datetime.datetime, endDate: datetime.datetime) -> bool:
+        """
+        Returns True of both points and all date between them are available
+        First we identify two edge cases
+            The list is empty, so the whole range is available
+            Either date is not available, then the range is not available
+        Then, we aim to pinpoint where the specified dateRange would be in our range,
+        To make a decision, we assert if the indices are next to eachother
+        If they are next to eachother, the date is in a 'available' zone
+        If they are not, the date is in an 'not available' zone
+        :param endDate:
+        :param startDate:
+        :return:
+        """
+        if not self.availabilityToggleDates:
+            return True
+
+        if (not self.is_date_available(startDate)) or (not self.is_date_available(endDate)):
+            return False
+
+        dates: list[datetime.datetime] = self.availabilityToggleDates + [startDate, endDate]
+        dates.sort()
+        toCheckDateIndeces = (dates.index(startDate), dates.index(endDate))
+
+        if toCheckDateIndeces[0] == toCheckDateIndeces[1] + 1:
             return True
 
     def insert_availablePeriod(self, startDate: datetime.datetime, endDate: datetime.datetime) -> None:
