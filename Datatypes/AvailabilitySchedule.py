@@ -26,7 +26,7 @@ class AvailabilitySchedule:
     def flip_togglesAreAvailable(self) -> None:
         self.togglesAreAvailable = not self.togglesAreAvailable
 
-    def is_date_available(self, toCheckDate: datetime.datetime):
+    def __is_date_available(self, toCheckDate: datetime.datetime):
         """
         Returns True if a single datapoint is available
         First we identify two edge cases
@@ -53,9 +53,10 @@ class AvailabilitySchedule:
         else:
             return True  # Even
 
-    def is_available(self, startDate: datetime.datetime, endDate: datetime.datetime) -> bool:
+    def is_available(self, startDate: datetime.datetime, endDate: datetime.datetime = None) -> bool:
         """
         Returns True of both points and all date between them are available
+        Will call self.is_date_available(startDate) if endDate is None
         First we identify two edge cases
             The list is empty, so the whole range is available
             Either date is not available, then the range is not available
@@ -67,10 +68,13 @@ class AvailabilitySchedule:
         :param startDate:
         :return:
         """
+        if endDate is None:
+            return self.__is_date_available(startDate)
+
         if not self.availabilityToggleDates:
             return True
 
-        if (not self.is_date_available(startDate)) or (not self.is_date_available(endDate)):
+        if (not self.__is_date_available(startDate)) or (not self.__is_date_available(endDate)):
             return False
 
         dates: list[datetime.datetime] = self.availabilityToggleDates + [startDate, endDate]
@@ -80,15 +84,36 @@ class AvailabilitySchedule:
         if toCheckDateIndeces[0] == toCheckDateIndeces[1] + 1:
             return True
 
+    def insert_notAvailablePeriod(self, startDate: datetime.datetime, endDate: datetime.datetime):
+        raise ValueError("Method not fully implemented")
+
     def insert_availablePeriod(self, startDate: datetime.datetime, endDate: datetime.datetime) -> None:
         if startDate >= endDate:
             raise ValueError("startdate cannot be greater than or equal to endDate")
 
+        if not self.availabilityToggleDates:
+            return  # If everything is available we cannot add an availableRange
+
         if startDate in self.availabilityToggleDates or endDate in self.availabilityToggleDates:
             raise ValueError("Method not fully implemented")
 
-        if self.is_available(startDate) and self.is_available(endDate):
-            # TODO Then insert both and create new list from begin->startDate + endDate -> end
-            pass
+        dates: list[datetime.datetime] = self.availabilityToggleDates + [startDate, endDate]
+        dates.sort()
+        startDateIndex, endDateIndex = (dates.index(startDate), dates.index(endDate))
+        # [:x] does not include x
+        # [x:] does include x
+
+        # Case 1 -> Both in not available -> [a, b]
+        if (not self.is_available(startDate)) and (not self.is_available(endDate)):
+            self.availabilityToggleDates = dates[:(startDateIndex+1)] + dates[endDateIndex:]
+        # Case 2 -> Both available -> ]a, b[
+        elif self.is_available(startDate) and self.is_available(endDate):
+            self.availabilityToggleDates = dates[:startDateIndex] + dates[(endDateIndex-1):]
+        # Case 3 -> A available and B not available -> ]a, b]
+        elif self.is_available(startDate) and (not self.is_available(endDate)):
+            self.availabilityToggleDates = dates[:startDateIndex] + dates[endDateIndex:]
+        # Case 4 -> A not available and B available ->
+        elif (not self.is_available(startDate)) and self.is_available(endDate):
+            self.availabilityToggleDates = dates[:(startDateIndex + 1)] + dates[(endDateIndex-1):]
         else:
-            raise ValueError("Method not fully implemented")
+            raise ValueError("All options exhausted (this should never happen)")

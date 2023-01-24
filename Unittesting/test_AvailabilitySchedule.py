@@ -47,6 +47,15 @@ class TestAvailabilitySchedule(unittest.TestCase):
         """
         self.assertFalse(self.availabilitySchedule2.is_available(datetime.datetime(2023, 1, 22)))
 
+    def test_inserting_available(self):
+        availabilitySchedule = AvailabilitySchedule([datetime.datetime(2023, 1, 20), datetime.datetime(2023, 1, 28)])
+        availabilitySchedule.insert_availablePeriod(datetime.datetime(2023, 1, 18), datetime.datetime(2023, 1, 30))
+        self.assertTrue(availabilitySchedule.is_available(datetime.datetime(2023, 1, 24)))
+
+        availabilitySchedule = AvailabilitySchedule([datetime.datetime(2023, 1, 20), datetime.datetime(2023, 1, 28)])
+        availabilitySchedule.insert_availablePeriod(datetime.datetime(2023, 1, 22), datetime.datetime(2023, 1, 26))
+        self.assertTrue(availabilitySchedule.is_available(datetime.datetime(2023, 1, 24)))
+
 
 if __name__ == "__main__":
     unittest.main()
