@@ -12,10 +12,11 @@ from Datatypes.Job import Job
 class MultiSchedule(Schedule):
     def __init__(self,
                  personVector: tuple[Person],
+                 jobVector: tuple[Job],
                  slotDates: tuple[Union[datetime.datetime, datetime.date]],
                  scheduleSlots: list[int],
                  scheduleJobs: tuple[Job]):
-        super().__init__(personVector=personVector, slotDates=slotDates, scheduleSlots=scheduleSlots)
+        super().__init__(personVector=personVector, jobVector=jobVector, slotDates=slotDates, scheduleSlots=scheduleSlots)
         self.scheduleJobs: tuple[Job] = scheduleJobs
 
     def __str__(self):

@@ -6,7 +6,6 @@ from Datatypes.Job import Job
 from ImportExport.read_person_list import read_person_list
 
 from ScheduleGenerators.LinearScheduleGenerator import LinearScheduleGenerator
-from JobScheduler.LinearRandomJobScheduler import LinearRandomJobScheduler
 from JobScheduler.WaveFuncCollapseScheduler import WaveFuncCollapseScheduler
 
 from ImportExport.ScheduleExporters.ScheduleToTxt import ScheduleToText

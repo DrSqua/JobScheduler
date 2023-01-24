@@ -2,20 +2,22 @@ import datetime
 from typing import Union
 
 from Datatypes.Person import Person
+from Datatypes.Job import Job
 
 
 class Schedule:
     def __init__(self,
                  personVector: tuple[Person],
+                 jobVector: tuple[Job],
                  slotDates: tuple[Union[datetime.datetime, datetime.date]],
                  scheduleSlots: list[int]):
         if len(slotDates) == 0:
             raise ValueError("No can do monsieur")
 
-        self.storedDateType: type = type(slotDates[0])
         self.personVector: tuple[Person] = personVector
+        self.jobVector: tuple[Job] = jobVector
+        self.slotDates: tuple[datetime.datetime] = slotDates
         self.scheduleSlots: list[int] = scheduleSlots  # -2 is not available, -1 is empty, 0->n is personIndex
-        self.slotDates: tuple[type(slotDates[0])] = slotDates
 
     def add_person(self, person) -> None:
         """
