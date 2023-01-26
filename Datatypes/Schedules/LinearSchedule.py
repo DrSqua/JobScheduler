@@ -14,8 +14,8 @@ class LinearSchedule(Schedule):
     """
     def __init__(self,
                  personVector: tuple[Person],
-                 jobVector: Union[tuple[Job], Job],
-                 slotDates: tuple[Union[datetime.datetime, datetime.date]],
+                 job: Union[Job],
+                 slotDates: tuple[datetime.datetime],
                  scheduleSlots: list[int]):
         """
 
@@ -24,16 +24,19 @@ class LinearSchedule(Schedule):
         :param slotDates:
         :param scheduleSlots:
         """
-        if isinstance(jobVector, Job):
-            self.job = jobVector
-        else:
-            if len(jobVector) != 1:
-                raise ValueError("LinearSchedule has a maximum of 1 job")
-            self.job = jobVector[0]
+
+        self.job = job
         super().__init__(personVector=personVector, jobVector=tuple([self.job]), slotDates=slotDates, scheduleSlots=scheduleSlots)
 
     def __str__(self):
-        print("-"*44 + "\n           | {}\n".format(self.job.JobName) + "-"*44)
+        dateStrLength = 0
+        jobStrLenght = len(self.job.jobName)
+        if isinstance(self.slotDateVector[0], datetime.datetime):
+            dateStrLength = 19
+
+        print(  "-"*(dateStrLength + jobStrLenght + 30) + "\n"
+              + (dateStrLength+1)*" " + "| {}\n".format(self.job.jobName)
+              + "-"*(dateStrLength + jobStrLenght + 30))
         for slotDate, slot in zip(self.slotDateVector, self.scheduleSlots):
             if slot == -1:
                 print("|{}| {:30}|".format(slotDate, "None"))
@@ -48,7 +51,7 @@ class LinearSchedule(Schedule):
     def from_empty(cls, job: Job,
                    slotDates: tuple[datetime.date],
                    personVector: tuple[Person] = ()) -> LinearSchedule:
-        return cls(personVector=personVector, jobVector=job, slotDates=slotDates, scheduleSlots=[-1]*len(slotDates))
+        return cls(personVector=personVector, job=job, slotDates=slotDates, scheduleSlots=[-1]*len(slotDates))
 
     @classmethod
     def from_slots(cls, personVector: tuple[Person], job: Job,
@@ -70,7 +73,7 @@ class LinearSchedule(Schedule):
             else:
                 indexedScheduleSlots.append(0)
 
-        return cls(personVector=personVector, jobVector=job, slotDates=slotDates, scheduleSlots=indexedScheduleSlots)
+        return cls(personVector=personVector, job=job, slotDates=slotDates, scheduleSlots=indexedScheduleSlots)
 
 """     Method which should be added, need to work around the circular import problem
         def __add__(self, other: Union[LinearSchedule, MultiSchedule]) -> MultiSchedule:

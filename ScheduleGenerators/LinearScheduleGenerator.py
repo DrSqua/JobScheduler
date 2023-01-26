@@ -17,9 +17,9 @@ class LinearScheduleGenerator(ScheduleGenerator):
         self.personVector = personVector
 
     def generate_from_totalActions(self,
-                                   endDate: datetime.date,
+                                   endDate: datetime.datetime,
                                    actionCount: int,
-                                   startDate: datetime.date = datetime.datetime.today().date(),
+                                   startDate: datetime.date = datetime.datetime.today(),
                                    fitToEndDate: bool = True) -> LinearSchedule:
         """
         Creates schedule using a range of dates, fitted to a set interval which fits in the given date range
@@ -35,9 +35,9 @@ class LinearScheduleGenerator(ScheduleGenerator):
                                              endDate, actionCount, startDate, fitToEndDate))
 
     def generate_from_bound_frequency(self,
-                                      endDate: datetime.date,
+                                      endDate: datetime.datetime,
                                       actionFrequency: int,
-                                      startDate: datetime.date = datetime.datetime.today().date(),
+                                      startDate: datetime.datetime = datetime.datetime.today(),
                                       fitToEndDate: bool = True
                                       ):
         """
@@ -53,7 +53,7 @@ class LinearScheduleGenerator(ScheduleGenerator):
                                              endDate, actionFrequency, startDate, fitToEndDate))
 
     def generate_from_unbound_frequency(self,
-                                        beginDate: datetime.date,
+                                        beginDate: datetime.datetime,
                                         actionCount: int,
                                         actionFrequency: int,
                                         fitAsEndDate: bool = False

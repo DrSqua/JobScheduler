@@ -9,14 +9,14 @@ class Job:
         :param JobName: Name of the Job, trivial
         :param jobDuration: How long this job takes. This is independable from the slots
         """
-        self.JobName: str = JobName
+        self.jobName: str = JobName
         self.JobDuration: datetime.timedelta
 
     def __str__(self):
-        return f"{self.JobName}"
+        return f"{self.jobName}"
 
     def __repr__(self):
         return self.__str__()
 
     def __format__(self, format_spec):
-        return self.JobName
+        return self.jobName
