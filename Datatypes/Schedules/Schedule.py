@@ -12,12 +12,13 @@ class Schedule:
                  slotDates: tuple[Union[datetime.datetime, datetime.date]],
                  scheduleSlots: list[int]):
         if len(slotDates) == 0:
-            raise ValueError("No can do monsieur")
+            raise ValueError("slotDates can not be 0")
 
-        self.personVector: tuple[Person] = personVector
-        self.jobVector: tuple[Job] = jobVector
-        self.slotDates: tuple[datetime.datetime] = slotDates
+        self.personVector: tuple[Person] = personVector  # Als person objects which can be used to fill the schedule
+        self.jobVector: tuple[Job] = jobVector  # All job objects which are also the indices of the 'column's
+        self.slotDateVector: tuple[datetime.datetime] = slotDates   # Rows of the schedule. Indicate the startdate for a slot
         self.scheduleSlots: list[int] = scheduleSlots  # -2 is not available, -1 is empty, 0->n is personIndex
+# -----------------------------------------------------------------
 
     def add_person(self, person) -> None:
         """
@@ -30,6 +31,12 @@ class Schedule:
             self.personVector += person
 
     def as_person(self, personIndex: int) -> Union[None, Person]:
+        """
+        Translates a personIndex to the personObject
+        If we get a '-1' or 'not filled' index we return None
+        :param personIndex: index of person in the personVector
+        :return:
+        """
         if personIndex == -1:
             return None
         if personIndex < 0 or len(self.personVector) < personIndex:
@@ -37,6 +44,12 @@ class Schedule:
         return self.personVector[personIndex]
 
     def as_personIndex(self, person: Person) -> int:
+        """
+        Returns the personIndex in the personVector of the input person Object
+        We match with '__eq__' method
+        :param person:
+        :return:
+        """
         if not person:
             return -1
         if person not in self.personVector:
@@ -46,15 +59,63 @@ class Schedule:
     def get_personVector(self) -> tuple[Person]:
         return self.personVector
 
-    def set_person(self, slotIndex, personIndex):
+    def set_personVector(self, personVector: tuple[Person]):
+        pass
+# -----------------------------------------------------------------
+
+    def set_slot(self, slotIndex: int, personIndex: int):
+        if not isinstance(personIndex, int):
+            raise ValueError("slotValue has to be passed as personIndex")
         self.scheduleSlots[slotIndex] = personIndex
 
-    def get_slotVector(self):
+    def set_slotMatrix(self, scheduleSlots: list[int]) -> None:
+        if any(not isinstance(personIndex, int) or len(self.personVector) < personIndex for personIndex in scheduleSlots):
+            raise ValueError("input scheduleSlots must all be integers")
+        if len(self.scheduleSlots) != len(scheduleSlots):
+            raise ValueError("instance scheduleSlots and input scheduleSlots must have the same length")
+        self.scheduleSlots = scheduleSlots
+
+    def get_slot(self, slotIndex: int, **kwargs) -> int:
+        return self.scheduleSlots[slotIndex]
+
+    def get_slot_asPerson(self, slotIndex: int) -> Person:
+        return self.as_person(self.get_slot(slotIndex=slotIndex))
+
+    def get_slotMatrix(self, **kwargs,):
         return self.scheduleSlots
 
-    def get_timespan_dates(self, slotIndex):
-        # TODO
-        return datetime.datetime.today(), datetime.datetime.today()
+    def get_slotVector_as_person(self) -> list[Union[None, Person]]:
+        """
+        Returns the full slotVector but with Person objects emplaced
+        :return:
+        """
+        return [self.as_person(personIndex=personIndex) for personIndex in self.get_slotMatrix()]
+
+    def get_slotCount(self) -> int:
+        return len(self.get_slotMatrix())
+
+    def is_validSlotIndex(self, slotIndex: int) -> bool:
+        if not (slotIndex < 0 | len(self.slotDateVector) < slotIndex):
+            return False
+        return self.scheduleSlots[slotIndex] != -2
+# -----------------------------------------------------------------
+
+    def get_slotDateVector(self):
+        """
+        Returns the slotDateVector
+        :return:
+        """
+        return self.slotDateVector
+# -----------------------------------------------------------------
 
     def is_filled(self) -> bool:
+        """
+        Checks all slots in the scheduleSlot vector for a '-1' value, which means 'to be filled'
+        If there is no 'to be filled' slot then we can return True, else we return False
+        :return:
+        """
         return not any(value == -1 for value in self.scheduleSlots)
+
+    def get_timespan_dates(self, slotIndex, jobIndex=0):
+        # TODO
+        return datetime.datetime.today(), datetime.datetime.today()

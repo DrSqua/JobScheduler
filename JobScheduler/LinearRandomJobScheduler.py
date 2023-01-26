@@ -13,5 +13,5 @@ class LinearRandomJobScheduler(JobSchedulingAgent):
         randomPersonOrder = sample(self.personVector, self.schedule.get_slotCount())
         filledSchedule: LinearSchedule = deepcopy(self.schedule)
 
-        filledSchedule.set_scheduleSlots(randomPersonOrder)
+        filledSchedule.set_slotMatrix(randomPersonOrder)
         return filledSchedule
