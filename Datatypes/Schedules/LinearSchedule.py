@@ -46,9 +46,10 @@ class LinearSchedule(Schedule):
         return ""  # TODO This is a bad way to make the function work"
 
     @classmethod
-    def from_empty(cls, job: Job,
+    def from_empty(cls,
+                   job: Job,
                    slotDates: tuple[datetime.datetime],
-                   personVector: tuple[Person] = ()) -> LinearSchedule:
+                   personVector: tuple[Person]) -> LinearSchedule:
         return cls(personVector=personVector, job=job, slotDates=slotDates, scheduleSlots=[-1]*len(slotDates))
 
     @classmethod

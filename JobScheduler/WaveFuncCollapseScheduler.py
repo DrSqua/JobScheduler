@@ -12,6 +12,8 @@ class WaveFuncCollapseScheduler(JobSchedulingAgent):
         scheduleAvailabilityList: list = []
         schedule = deepcopy(self.schedule)
 
+        unusedOptions: list[int] = [schedule.as_personIndex(person) for person in self.schedule.get_personVector()]
+
         while not schedule.is_filled():
             for slotIndex, slot in enumerate(schedule.get_slotMatrix()):
                 # Check if slot has to be filled
@@ -23,8 +25,9 @@ class WaveFuncCollapseScheduler(JobSchedulingAgent):
                 slotAvailabilitList: list = []
                 startDate, endDate = schedule.get_timespan_dates(slotIndex)
                 for person in schedule.get_personVector():
-                    if person.is_available(startDate, endDate):
-                        slotAvailabilitList.append(schedule.as_personIndex(person))
+                    personIndex = self.schedule.as_personIndex(person)
+                    if person.is_available(startDate, endDate) and personIndex in unusedOptions:
+                        slotAvailabilitList.append(personIndex)
                 scheduleAvailabilityList.append(slotAvailabilitList)
 
             # Get smallest list
@@ -35,7 +38,8 @@ class WaveFuncCollapseScheduler(JobSchedulingAgent):
             listWithSmallestOptions = scheduleAvailabilityList[slotWithLowestOptionsIndex]
 
             # Here we choose a random person of the options
-            choice = sample(listWithSmallestOptions, 1)[0]
+            choice: int = sample(listWithSmallestOptions, 1)[0]  # personIndex of the chosen Person
+            unusedOptions.pop(unusedOptions.index(choice))
             schedule.set_slot(slotIndex=slotWithLowestOptionsIndex, slotValue=choice)
             scheduleAvailabilityList.clear()
         return schedule
