@@ -27,23 +27,28 @@ class LinearSchedule(Schedule):
         super().__init__(personVector=personVector, jobVector=tuple([self.job]), slotDates=slotDates, scheduleSlots=scheduleSlots)
 
     def __str__(self):
-        dateStrLength = 0
-        jobStrLenght = len(self.job.jobName)
-        if isinstance(self.slotDateVector[0], datetime.datetime):
-            dateStrLength = 19
+        dateStrLen = 19
 
-        print(  "-"*(dateStrLength + jobStrLenght + 30) + "\n"
-              + (dateStrLength+1)*" " + "| {}\n".format(self.job.jobName)
-              + "-"*(dateStrLength + jobStrLenght + 30))
-        for slotDate, slot in zip(self.slotDateVector, self.scheduleSlots):
-            if slot == -1:
-                print("|{}| {:30}|".format(slotDate, "None"))
+        personVector = map(self.as_person, self.scheduleSlots)
+        personNameLengthList = list(map(lambda x: len(x.personName) if x else 0, personVector)) + [len(self.job.jobName)]
+        columnWidth = max(personNameLengthList)  # Stores how wide we can format the personName per comumn
+
+        # Header
+        result: str = dateStrLen*" " + " |"
+        result += (" {:" + str(columnWidth) + "} |").format(self.job.jobName)
+
+        # Horizontal dotted line
+        result += "\n" + "-" * (dateStrLen + 2 + columnWidth + 2)
+
+        # Frame
+        for slotIndex, slotDate in enumerate(self.slotDateVector):
+            result += "\n" + str(slotDate) + " |"
+            person = self.get_slot_asPerson(slotIndex=slotIndex)
+            if not person:
+                result += (" {:"+str(columnWidth)+"} |").format("None")
                 continue
-            if slot == -2:
-                print("|{}| {:30}|".format(slotDate, "    "))
-                continue
-            print("|{}| {:30}|".format(slotDate, self.as_person(slot)))
-        return ""  # TODO This is a bad way to make the function work"
+            result += (" {:"+str(columnWidth)+"} |").format(person)
+        return result
 
     @classmethod
     def from_empty(cls,
