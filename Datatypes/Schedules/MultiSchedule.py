@@ -57,29 +57,27 @@ class MultiSchedule(Schedule):
 
         for jobIndex in range(len(self.jobVector)):
             slotVector = self.get_slotMatrix(jobIndex)
-            personNameLengthList = [len(self.as_person(personIndex).personName) for personIndex in slotVector]
+            personVector = map(self.as_person, slotVector)
+            personNameLengthList = list(map(lambda x: len(x.personName) if x else 0, personVector)) + [len(self.as_job(jobIndex).jobName)]
             columnWidth.append(max(personNameLengthList))
 
-
         # Header
-        print(dateStrLen*" " + " |", end="")
-        jobGen = (job.jobName for job in self.jobVector)
-        for jobName, j in zip(jobGen, columnWidth):
-            print((" {:" + str(j) + "} |").format(jobName), end="")
-        print("")
-        print("-" * (dateStrLen + 2 + sum(columnWidth) + 2*len(columnWidth)))
+        result: str = dateStrLen*" " + " |"
+        result += "".join([(" {:" + str(j) + "} |").format(job.jobName) for job, j in zip(self.jobVector, columnWidth)])
+
+        # Horizontal dotted line
+        result += "\n" + "-" * (dateStrLen + 2 + sum(columnWidth) + 2*len(columnWidth))
 
         # Frame
         for slotIndex, slotDate in enumerate(self.slotDateVector):
-            print(str(slotDate) + " |", end="")
+            result += "\n" + str(slotDate) + " |"
             for jobIndex, j in zip(range(len(self.jobVector)), columnWidth):
                 person = self.get_slot_asPerson(slotIndex=slotIndex, jobIndex=jobIndex)
                 if not person:
-                    print((" {:"+str(j)+"} |").format("None"), end="")
+                    result += (" {:"+str(j)+"} |").format("None")
                     continue
-                print((" {:"+str(j)+"} |").format(person), end="")
-            print("")
-        return ""  # TODO This is a bad way to make the function work"
+                result += (" {:"+str(j)+"} |").format(person)
+        return result
 
     def __add__(self, other: Union[LinearSchedule, MultiSchedule]):
         """

@@ -33,9 +33,9 @@ class WaveFuncCollapseScheduler(JobSchedulingAgent):
             lowestOptions = min(lenOptions)
             slotWithLowestOptionsIndex = lenOptions.index(lowestOptions)
             listWithSmallestOptions = scheduleAvailabilityList[slotWithLowestOptionsIndex]
+
+            # Here we choose a random person of the options
             choice = sample(listWithSmallestOptions, 1)[0]
             schedule.set_slot(slotIndex=slotWithLowestOptionsIndex, slotValue=choice)
             scheduleAvailabilityList.clear()
         return schedule
-
-

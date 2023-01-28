@@ -6,7 +6,7 @@ from Datatypes.Schedules.MultiSchedule import MultiSchedule
 from Datatypes.Person import Person
 from Datatypes.Job import Job
 
-from JobScheduler.RandomJobScheduler import RandomJobScheduler
+from JobScheduler.SampleJobScheduler import SampleJobScheduler
 
 from ScheduleGenerators.DateRangeGeneratorFunctions.TimeRangeGenerator import generate_timerange
 from ScheduleGenerators.MultiScheduleGenerator import MultiScheduleGenerator
@@ -41,16 +41,21 @@ class TestMultiSchedule(unittest.TestCase):
         multiSchedule += linearSchedule
         #print(multiSchedule)
 
-    def test_random_scheduler(self):
+    def test_sample_scheduler(self):
         startTime = datetime.datetime(2023, 1, 30)
-        job = Job("Socialmedia")
+        job = Job("Share on FB")
         linearSchedule = LinearSchedule.from_empty(job=job,
                                                    slotDates=generate_timerange(startTime, datetime.timedelta(days=1), 10),
                                                    personVector=self.personList)
-        multiSchedule = MultiSchedule.from_linear(linearSchedule)
-        multiSchedule += linearSchedule
+        print(linearSchedule)
 
-        jobScheduler = RandomJobScheduler(multiSchedule)
+        multiSchedule = MultiSchedule.from_linear(linearSchedule)
+        job2 = Job("Share on FB")
+        linearSchedule.set_job(job2)
+        multiSchedule += linearSchedule
+        print(multiSchedule)
+
+        jobScheduler = SampleJobScheduler(multiSchedule)
         filledSchedule = jobScheduler.fill_schedule()
         print(filledSchedule)
 

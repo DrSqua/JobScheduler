@@ -7,7 +7,7 @@ from ImportExport.read_person_list import read_person_list
 
 from ScheduleGenerators.LinearScheduleGenerator import LinearScheduleGenerator
 from JobScheduler.WaveFuncCollapseScheduler import WaveFuncCollapseScheduler
-from JobScheduler.RandomJobScheduler import RandomJobScheduler
+from JobScheduler.SampleJobScheduler import SampleJobScheduler
 
 from ImportExport.ScheduleExporters.ScheduleToTxt import ScheduleToText
 
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     print(emptySchedule)
 
     print(f"Setting up and running scheduler ...")
-    scheduler = RandomJobScheduler(emptySchedule)
+    scheduler = SampleJobScheduler(emptySchedule)
     filledSchedule = scheduler.fill_schedule()
     saved_time.append(time.time())
     print(f"Done! {saved_time[-1] - saved_time[-2]}")

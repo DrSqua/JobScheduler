@@ -4,7 +4,7 @@ from copy import deepcopy
 from JobScheduler.JobSchedulingAgent import JobSchedulingAgent
 
 
-class RandomJobScheduler(JobSchedulingAgent):
+class SampleJobScheduler(JobSchedulingAgent):
     def __init__(self, startingSchedule):
         super().__init__(startingSchedule)
 

@@ -73,6 +73,9 @@ class LinearSchedule(Schedule):
 
         return cls(personVector=personVector, job=job, slotDates=slotDates, scheduleSlots=indexedScheduleSlots)
 
+    def set_job(self, job: Job):
+        self.job = job
+
 """     Method which should be added, need to work around the circular import problem
         def __add__(self, other: Union[LinearSchedule, MultiSchedule]) -> MultiSchedule:
         if isinstance(other, MultiSchedule):

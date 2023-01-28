@@ -16,12 +16,21 @@ class Schedule:
 
         self.personVector: tuple[Person] = personVector  # Als person objects which can be used to fill the schedule
         self.jobVector: tuple[Job] = jobVector  # All job objects which are also the indices of the 'column's
-        self.slotDateVector: tuple[datetime.datetime] = slotDates   # Rows of the schedule. Indicate the startdate for a slot
+        self.slotDateVector: tuple[
+            datetime.datetime] = slotDates  # Rows of the schedule. Indicate the startdate for a slot
         self.scheduleSlots: list[int] = scheduleSlots  # -2 is not available, -1 is empty, 0->n is personIndex
-# -----------------------------------------------------------------
+
+    # -----------------------------------------------------------------
 
     def is_valid_personIndex(self, personIndex: int) -> bool:
-        return 0 <= personIndex and personIndex < len(self.personVector)
+        return 0 <= personIndex < len(self.personVector)
+
+    def is_existing_personIndex(self, personIndex: int) -> bool:
+        if not self.is_valid_personIndex(personIndex):
+            return False
+        if personIndex == -2 or personIndex == -1:
+            return False
+        return True
 
     def add_person(self, person) -> None:
         """
@@ -67,8 +76,20 @@ class Schedule:
 
     def rebase_personVector(self, newPersonVector: tuple[Person]):
         pass
-# -----------------------------------------------------------------
 
+    # -----------------------------------------------------------------
+    def is_valid_jobIndex(self, jobIndex: int) -> bool:
+        return 0 <= jobIndex < len(self.jobVector)
+
+    def as_job(self, jobIndex: int) -> Job:
+        if not self.is_valid_jobIndex(jobIndex=jobIndex):
+            raise ValueError("jobIndex has to be 0 and jobVector length")
+        return self.jobVector[jobIndex]
+
+    def as_jobIndex(self, job: Job) -> int:
+        pass
+
+    # -----------------------------------------------------------------
     def set_slot(self, slotIndex: int, slotValue: Union[int, Person]):
         if isinstance(slotValue, Person):
             slotValue = self.as_personIndex(slotValue)
@@ -84,7 +105,8 @@ class Schedule:
         if isinstance(scheduleSlots[0], Person):
             scheduleSlots = [self.as_personIndex(person) for person in scheduleSlots]
 
-        if any(not self.is_valid_personIndex(personIndex) or personIndex == -1 or personIndex == -2 for personIndex in scheduleSlots):
+        if any(not self.is_valid_personIndex(personIndex) or personIndex == -1 or personIndex == -2 for personIndex in
+               scheduleSlots):
             raise ValueError("all input scheduleSlots must be valid personIndices, empty or nonFill")
         if len(self.scheduleSlots) != len(scheduleSlots):
             raise ValueError("instance scheduleSlots and input scheduleSlots must have the same length")
@@ -96,7 +118,7 @@ class Schedule:
     def get_slot_asPerson(self, slotIndex: int) -> Person:
         return self.as_person(self.get_slot(slotIndex=slotIndex))
 
-    def get_slotMatrix(self, **kwargs,):
+    def get_slotMatrix(self, **kwargs, ):
         return self.scheduleSlots
 
     def get_slotVector_as_person(self) -> list[Union[None, Person]]:
@@ -113,7 +135,8 @@ class Schedule:
         if not (slotIndex < 0 | len(self.slotDateVector) < slotIndex):
             return False
         return self.scheduleSlots[slotIndex] != -2
-# -----------------------------------------------------------------
+
+    # -----------------------------------------------------------------
 
     def get_slotDateVector(self):
         """
@@ -121,7 +144,8 @@ class Schedule:
         :return:
         """
         return self.slotDateVector
-# -----------------------------------------------------------------
+
+    # -----------------------------------------------------------------
 
     def is_filled(self) -> bool:
         """
