@@ -20,6 +20,9 @@ class Schedule:
         self.scheduleSlots: list[int] = scheduleSlots  # -2 is not available, -1 is empty, 0->n is personIndex
 # -----------------------------------------------------------------
 
+    def is_valid_personIndex(self, personIndex: int) -> bool:
+        return 0 <= personIndex and personIndex < len(self.personVector)
+
     def add_person(self, person) -> None:
         """
         Adds a new person to the personVector
@@ -61,16 +64,28 @@ class Schedule:
 
     def set_personVector(self, personVector: tuple[Person]):
         pass
+
+    def rebase_personVector(self, newPersonVector: tuple[Person]):
+        pass
 # -----------------------------------------------------------------
 
-    def set_slot(self, slotIndex: int, personIndex: int):
-        if not isinstance(personIndex, int):
-            raise ValueError("slotValue has to be passed as personIndex")
-        self.scheduleSlots[slotIndex] = personIndex
+    def set_slot(self, slotIndex: int, slotValue: Union[int, Person]):
+        if isinstance(slotValue, Person):
+            slotValue = self.as_personIndex(slotValue)
+        if not isinstance(slotValue, int):
+            raise ValueError("slotValue has to be passed as personIndex or person instance")
+        if not self.is_valid_personIndex(slotValue):
+            raise ValueError("personIndex is not valid")
+        if self.is_valid_slotIndex(slotIndex):
+            raise ValueError("slotIndex is not valid")
+        self.scheduleSlots[slotIndex] = slotValue
 
-    def set_slotMatrix(self, scheduleSlots: list[int]) -> None:
-        if any(not isinstance(personIndex, int) or len(self.personVector) < personIndex for personIndex in scheduleSlots):
-            raise ValueError("input scheduleSlots must all be integers")
+    def set_slotMatrix(self, scheduleSlots: Union[list[Person], list[int]]) -> None:
+        if isinstance(scheduleSlots[0], Person):
+            scheduleSlots = [self.as_personIndex(person) for person in scheduleSlots]
+
+        if any(not self.is_valid_personIndex(personIndex) or personIndex == -1 or personIndex == -2 for personIndex in scheduleSlots):
+            raise ValueError("all input scheduleSlots must be valid personIndices, empty or nonFill")
         if len(self.scheduleSlots) != len(scheduleSlots):
             raise ValueError("instance scheduleSlots and input scheduleSlots must have the same length")
         self.scheduleSlots = scheduleSlots
@@ -92,9 +107,9 @@ class Schedule:
         return [self.as_person(personIndex=personIndex) for personIndex in self.get_slotMatrix()]
 
     def get_slotCount(self) -> int:
-        return len(self.get_slotMatrix())
+        return len(self.scheduleSlots)
 
-    def is_validSlotIndex(self, slotIndex: int) -> bool:
+    def is_valid_slotIndex(self, slotIndex: int) -> bool:
         if not (slotIndex < 0 | len(self.slotDateVector) < slotIndex):
             return False
         return self.scheduleSlots[slotIndex] != -2

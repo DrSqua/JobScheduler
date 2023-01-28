@@ -5,7 +5,7 @@ from Datatypes.AvailabilitySchedule import AvailabilitySchedule
 
 class Person:
     def __init__(self, name: str, availabilitySchedule: AvailabilitySchedule = AvailabilitySchedule()):
-        self.personName: str = name
+        self.personName: str = name.strip()
         self.availabilitySchedule: availabilitySchedule
 
     def __str__(self):

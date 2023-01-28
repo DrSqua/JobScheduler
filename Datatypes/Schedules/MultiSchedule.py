@@ -48,37 +48,59 @@ class MultiSchedule(Schedule):
             raise ValueError("TODO: Implement summing LinearSchedules if personVectors are not equal")
 
     def __str__(self):
-
+        """
+        Prints the multischedule
+        :return:
+        """
         dateStrLen = 19
         columnWidth: list[int] = []  # Stores how wide we can format the personName per comumn
 
+        for jobIndex in range(len(self.jobVector)):
+            slotVector = self.get_slotMatrix(jobIndex)
+            personNameLengthList = [len(self.as_person(personIndex).personName) for personIndex in slotVector]
+            columnWidth.append(max(personNameLengthList))
+
+
         # Header
-        print(dateStrLen*" " + " | ", end="")
+        print(dateStrLen*" " + " |", end="")
         jobGen = (job.jobName for job in self.jobVector)
-        for job in jobGen:
-            columnWidth.append(len(job.__str__()))
-            print(job, end="")
-        print(" |")
-        print("-" * (dateStrLen + 2))
+        for jobName, j in zip(jobGen, columnWidth):
+            print((" {:" + str(j) + "} |").format(jobName), end="")
+        print("")
+        print("-" * (dateStrLen + 2 + sum(columnWidth) + 2*len(columnWidth)))
 
         # Frame
         for slotIndex, slotDate in enumerate(self.slotDateVector):
-            print(str(slotDate) + " | ", end="")
+            print(str(slotDate) + " |", end="")
             for jobIndex, j in zip(range(len(self.jobVector)), columnWidth):
                 person = self.get_slot_asPerson(slotIndex=slotIndex, jobIndex=jobIndex)
                 if not person:
-                    print(("{:"+str(j)+"}").format("None"), end="")
+                    print((" {:"+str(j)+"} |").format("None"), end="")
                     continue
-                print(("{:"+str(j)+"}").format(person, end=""))
-            print(" |")
+                print((" {:"+str(j)+"} |").format(person), end="")
+            print("")
         return ""  # TODO This is a bad way to make the function work"
 
     def __add__(self, other: Union[LinearSchedule, MultiSchedule]):
+        """
+        Adds two schedules together
+        :param other:
+        :return:
+        """
+        if self.personVector != other.personVector:
+            self.rebase_personVector(tuple(set(self.personVector).union(other.personVector)))
         if isinstance(other, LinearSchedule):
+            # TODO: So, so, much to check
+            self.jobVector += tuple([other.job])
+            self.scheduleSlots += other.scheduleSlots
+        if isinstance(other, MultiSchedule):
             raise ValueError("TODO: Implement this")
+        return self
 
-    def get_slotMatrix(self, jobIndex, **kwargs,):
-        return self.scheduleSlots
+    def get_slotMatrix(self, jobIndex, **kwargs):
+        if jobIndex is None:
+            return super().get_slotMatrix()
+        return self.scheduleSlots[jobIndex*len(self.slotDateVector):(jobIndex+1)*len(self.slotDateVector)]
 
     def get_slot(self, slotIndex: int, **kwargs) -> int:
         if "jobIndex" in kwargs:

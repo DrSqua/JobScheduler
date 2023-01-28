@@ -10,7 +10,7 @@ class Job:
         :param jobDuration: How long this job takes. This is independable from the slots
         """
         self.jobName: str = JobName
-        self.JobDuration: datetime.timedelta
+        self.jobDuration: datetime.timedelta = jobDuration
 
     def __str__(self):
         return f"{self.jobName}"

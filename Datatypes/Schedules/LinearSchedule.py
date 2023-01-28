@@ -18,9 +18,7 @@ class LinearSchedule(Schedule):
                  slotDates: tuple[datetime.datetime],
                  scheduleSlots: list[int]):
         """
-
         :param personVector:
-        :param jobVector:
         :param slotDates:
         :param scheduleSlots:
         """
@@ -49,13 +47,13 @@ class LinearSchedule(Schedule):
 
     @classmethod
     def from_empty(cls, job: Job,
-                   slotDates: tuple[datetime.date],
+                   slotDates: tuple[datetime.datetime],
                    personVector: tuple[Person] = ()) -> LinearSchedule:
         return cls(personVector=personVector, job=job, slotDates=slotDates, scheduleSlots=[-1]*len(slotDates))
 
     @classmethod
     def from_slots(cls, personVector: tuple[Person], job: Job,
-                   slotDates: tuple[datetime.date], scheduleSlots: list[Union[None, Person]]):
+                   slotDates: tuple[datetime.datetime], scheduleSlots: list[Union[None, Person]]):
         """
 
         :param personVector:
