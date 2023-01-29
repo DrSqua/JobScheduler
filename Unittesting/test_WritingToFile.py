@@ -34,7 +34,7 @@ class TestWritingToTXT(unittest.TestCase):
     def test_writeMultiToFile(self):
         startTime = datetime.datetime(2023, 1, 30, hour=12)
         endTime = datetime.datetime(2023, 3, 22, hour=12)
-        job = Job("Post op FB")
+        job = Job("Post op FB + Verander achtergrond")
         timeRange = fit_range(startTime=startTime, endTime=endTime, actionCount=len(self.personList)//2)
         linearSchedule = LinearSchedule.from_empty(job=job,
                                                    slotDates=timeRange,
@@ -43,6 +43,8 @@ class TestWritingToTXT(unittest.TestCase):
 
         generator = WaveFuncCollapseScheduler(multiSchedule)
         fittedSchedule = generator.fill_schedule()
+
+        print(fittedSchedule)
 
         ScheduleToText.schedule_to_txt(fittedSchedule, "test_MultiToTXT.txt")
 

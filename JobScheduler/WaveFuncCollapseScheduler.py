@@ -8,7 +8,7 @@ class WaveFuncCollapseScheduler(JobSchedulingAgent):
     def __init__(self, startingSchedule):
         super().__init__(startingSchedule)
 
-    def get_options(self) -> list[int]:
+    def get_options(self, checkSchedule=False) -> list[int]:
         return [self.schedule.as_personIndex(person) for person in self.schedule.get_personVector()]
 
     def fill_schedule(self, checkAvailability: bool = False):
@@ -21,7 +21,7 @@ class WaveFuncCollapseScheduler(JobSchedulingAgent):
             if not unusedOptions:
                 unusedOptions = self.get_options()
 
-            for slotIndex, slot in enumerate(schedule.get_slotMatrix()):
+            for slotIndex, slot in enumerate(schedule.get_slotVector()):
                 # Check if slot has to be filled
                 if slot != -1:
                     scheduleAvailabilityList.append([])
