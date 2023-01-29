@@ -95,7 +95,7 @@ class MultiSchedule(Schedule):
             raise ValueError("TODO: Implement this")
         return self
 
-    def get_slotMatrix(self, jobIndex, **kwargs):
+    def get_slotMatrix(self, jobIndex=None):
         if jobIndex is None:
             return super().get_slotMatrix()
         return self.scheduleSlots[jobIndex*len(self.slotDateVector):(jobIndex+1)*len(self.slotDateVector)]

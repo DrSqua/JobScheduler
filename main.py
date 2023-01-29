@@ -3,10 +3,9 @@ import datetime
 
 from Datatypes.Person import Person
 from Datatypes.Job import Job
-from ImportExport.read_person_list import read_person_list
+from ImportExport.PersonImporters.read_person_list import read_person_list
 
 from ScheduleGenerators.LinearScheduleGenerator import LinearScheduleGenerator
-from JobScheduler.WaveFuncCollapseScheduler import WaveFuncCollapseScheduler
 from JobScheduler.SampleJobScheduler import SampleJobScheduler
 
 from ImportExport.ScheduleExporters.ScheduleToTxt import ScheduleToText
@@ -18,7 +17,7 @@ if __name__ == '__main__':
     saved_time: list = [time.time()]
 
     print("Setting up variables ...")
-    personList: tuple[Person] = read_person_list("ImportExport/PraesidiumNamenlijst.txt")
+    personList: tuple[Person] = read_person_list("ImportExport/PersonImporters/PraesidiumNamenlijst.txt")
     job = Job("Delen op socials")
 
     dateStart = datetime.datetime(2023, 1, 30)

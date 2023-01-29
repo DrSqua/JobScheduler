@@ -4,6 +4,7 @@ import datetime
 from Datatypes.Person import Person
 from Datatypes.Job import Job
 from Datatypes.Schedules.LinearSchedule import LinearSchedule
+from Datatypes.Schedules.MultiSchedule import MultiSchedule
 
 from ScheduleGenerators.LinearScheduleGenerators.LinearScheduleGenerators import fit_range
 
@@ -28,8 +29,21 @@ class MyTestCase(unittest.TestCase):
                                                    personVector=self.personList)
         generator = WaveFuncCollapseScheduler(linearSchedule)
         fittedSchedule = generator.fill_schedule()
-        print(fittedSchedule)
+        #print(fittedSchedule)
 
+    def test_multi_WaveFunctionCollapse(self):
+        startTime = datetime.datetime(2023, 1, 30, hour=12)
+        endTime = datetime.datetime(2023, 3, 22, hour=12)
+        job = Job("Socialmedia")
+        timeRange = fit_range(startTime=startTime, endTime=endTime, actionCount=len(self.personList))
+        linearSchedule = LinearSchedule.from_empty(job=job,
+                                                   slotDates=timeRange,
+                                                   personVector=self.personList)
+        multiSchedule = MultiSchedule.from_linear(linearSchedule) + linearSchedule
+
+        generator = WaveFuncCollapseScheduler(multiSchedule)
+        fittedSchedule = generator.fill_schedule()
+        print(fittedSchedule)
 
 if __name__ == '__main__':
     unittest.main()
