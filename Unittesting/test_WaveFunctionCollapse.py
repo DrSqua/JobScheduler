@@ -45,5 +45,6 @@ class MyTestCase(unittest.TestCase):
         fittedSchedule = generator.fill_schedule()
         print(fittedSchedule)
 
+
 if __name__ == '__main__':
     unittest.main()

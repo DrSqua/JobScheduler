@@ -1,8 +1,8 @@
 import datetime
-from typing import Union, Callable
+from typing import Union, Callable, cast, Sequence
 from functools import singledispatch
 import abc
-from collections import abc
+from collections import Iterable
 
 from Datatypes.Person import Person
 from Datatypes.Job import Job
@@ -17,21 +17,40 @@ class Schedule:
         if len(slotDates) == 0:
             raise ValueError("slotDates can not be 0")
 
-        self.personVector: tuple[Person] = personVector  # Als person objects which can be used to fill the schedule
-        self.jobVector: tuple[Job] = jobVector  # All job objects which are also the indices of the 'column's
-        self.slotDateVector: tuple[
-            datetime.datetime] = slotDates  # Rows of the schedule. Indicate the startdate for a slot
+        self.personVector: tuple[Person] = cast(tuple[Person], personVector) # As person objects which can be used to fill the schedule
+        self.jobVector: tuple[Job] = cast(tuple[Job], jobVector)  # All job objects which are also the indices of the 'column's
+        self.slotDateVector: tuple[datetime.datetime] = cast(tuple[datetime.datetime], slotDates)  # Rows of the schedule. (startslot)
         self.slotRowCount = len(self.slotDateVector)
-        self.slotVector: list[int] = scheduleSlots  # -2 is not available, -1 is empty, 0->n is personIndex
+        self.slotVector: list[int] = cast(list[int], scheduleSlots)  # -2 is not available, -1 is empty, 0->n is personIndex
 
-    @singledispatch
-    def __getitem__(self, argument: Union[int, Callable[[int], bool]], jobIndex: int = None) -> Union[int, list[int]]:
+    def __getitem__(self, slotIndex: int, jobIndex: int = None) -> Union[int, list[int]]:
         """
         Returns either the filled personIndex, not filled or non valid
-        :param slotIndex:
+        :argument: argument for selection
         :param jobIndex:
         :return:
         """
+        return self.__get_slot__(slotIndex=slotIndex, jobIndex=jobIndex)
+
+    def __setitem__(self, slotIndexArg: Union[int, Iterable], slotValue: Union[int, Person]):
+        if isinstance(slotIndexArg, int):
+            self.__set_slot__(slotIndex=slotIndexArg, slotValue=slotValue, jobIndex=None)
+            return
+        # TODO, find out how to hint the correct type. Iterable does not infer __getitem__
+        if hasattr(slotIndexArg, '__iter__') and hasattr(slotIndexArg, '__getitem__') and len(slotIndexArg) == 2:
+            self.__set_slot__(slotIndex=slotIndexArg[0], slotValue=slotValue, jobIndex=slotIndexArg[1])
+            return
+
+    # slot-----------------------------------------------------------------
+    def is_valid_slotValue(self, personIndex: int) -> bool:
+        """
+        If the slotValue is a valid int. Either it exists as personIndex, is not filled (-1) or is not to be filled (-2)
+        :param personIndex:
+        :return:
+        """
+        if personIndex in {-2, 1} or self.is_existing_personIndex(personIndex):
+            return True
+        return False
 
     def __get_slot__(self, slotIndex: int, jobIndex: int = None) -> int:
         """
@@ -49,22 +68,26 @@ class Schedule:
             raise ValueError(f"slotIndex {slotIndex} is not valid")
         return self.slotVector[slotIndex + jobIndex * self.slotRowCount]
 
-    @__getitem__.register
-    def _(self, argument: int, jobIndex: int = None) -> int:
-        slotIndex = argument
+    def __set_slot__(self, slotIndex: int, slotValue: Union[int, Person], jobIndex: int = None):
+        """
+
+        :param slotIndex:
+        :param slotValue:
+        :param jobIndex:
+        :return:
+        """
+        if isinstance(slotValue, Person):
+            slotValue = self.as_personIndex(slotValue)
+        if not self.is_existing_personIndex(slotValue):
+            raise ValueError("slotValue is not valid")
         if not self.is_valid_slotIndex(slotIndex):
-            raise ValueError("slotIndex must be valid")
-        if jobIndex is None:
-            return self.__get_slot__(slotIndex=slotIndex)
-        return self.__get_slot__(slotIndex=slotIndex, jobIndex=jobIndex)
-
-    def __get__selection(self, operator: Callable[[int], bool], jobIndex: int = None) -> list:
-        unfiltered = self.get_slotVector(jobIndex=jobIndex)
-        return [personIndex for personIndex in unfiltered if operator(personIndex)]
-
-    @__getitem__.register
-    def _(self, argument: abc.Callable, jobIndex: int = None) -> list[int]:
-        return self.__get__selection(operator=argument, jobIndex=jobIndex)
+            raise ValueError("slotIndex is not valid")
+        if not jobIndex:
+            self.slotVector[slotIndex] = slotValue
+            return
+        if not self.is_valid_jobIndex(jobIndex):
+            raise ValueError(f"jobIndex {jobIndex} is not valid")
+        self.slotVector[slotIndex + self.slotRowCount*jobIndex] = slotValue
 
     # person and personIndex methods----------------------------------------------------------------
     def is_existing_personIndex(self, personIndex: int) -> bool:
@@ -74,18 +97,6 @@ class Schedule:
         :return:
         """
         return 0 <= personIndex < len(self.personVector)
-
-    def is_valid_personIndex(self, personIndex: int) -> bool:
-        """
-        If the personIndex is a valid index. Either it exists, is not filled (-1) or is not to be filled (-2)
-        :param personIndex:
-        :return:
-        """
-        if personIndex == -2 or personIndex == -1:
-            return True
-        if self.is_existing_personIndex(personIndex):
-            return True
-        return False
 
     def add_person(self, person: Person) -> None:
         """
@@ -104,11 +115,13 @@ class Schedule:
         :param personIndex: index of person in the personVector
         :return:
         """
+        if personIndex == -1:
+            return None
         if self.is_existing_personIndex(personIndex):
             return self.personVector[personIndex]
-        if self.is_valid_personIndex(personIndex):
+        if self.is_valid_slotValue(personIndex):
             return None
-        raise ValueError("personIndex must either be valid and not existing")
+        raise ValueError(f"personIndex {personIndex} is invalid")
 
     def as_personIndex(self, person: Person) -> int:
         """
@@ -117,10 +130,8 @@ class Schedule:
         :param person:
         :return:
         """
-        if not person:
-            return -1
         if person not in self.personVector:
-            raise ValueError("First add a Person with add_person() before getting the ID")
+            raise ValueError("First add a Person with add_person() before getting the personIndex")
         return self.personVector.index(person)
 
     # personVector-----------------------------------------------------------------
@@ -145,32 +156,17 @@ class Schedule:
         return self.jobVector.index(job)
 
     def set_job(self, job: Job, jobIndex: int = 0):
+        """
+        Altering the Job instance in the jobVector
+        :param job:
+        :param jobIndex:
+        :return:
+        """
         if not self.is_valid_jobIndex(jobIndex=jobIndex):
             raise ValueError(f"jobIndex {jobIndex} is not valid")
         asList = list(self.jobVector)
         asList[jobIndex] = job
         self.jobVector = tuple(asList)
-
-    # slot-----------------------------------------------------------------
-    def set_slot(self, slotIndex: int, slotValue: Union[int, Person]):
-        if isinstance(slotValue, Person):
-            slotValue = self.as_personIndex(slotValue)
-        if not isinstance(slotValue, int):
-            raise ValueError("slotValue has to be passed as personIndex or person instance")
-        if not self.is_existing_personIndex(slotValue):
-            raise ValueError("personIndex is not valid")
-        if not self.is_valid_slotIndex(slotIndex):
-            raise ValueError("slotIndex is not valid")
-        self.slotVector[slotIndex] = slotValue
-
-    def get_slot(self, slotIndex: int, jobIndex: int = None) -> Person:
-        """
-        Passes slotIndex and jobIndex to get_slot and then as_person functions
-        :param slotIndex:
-        :param jobIndex:
-        :return:
-        """
-        return self.as_person(self.__get_slot__(slotIndex, jobIndex))
 
     # slotMatrix and vector-----------------------------------------------------------------
     def is_valid_slotIndex(self, slotIndex: int, jobIndex: int = None) -> bool:
@@ -209,7 +205,7 @@ class Schedule:
         if isinstance(scheduleSlots[0], Person):
             scheduleSlots = [self.as_personIndex(person) for person in scheduleSlots]
 
-        if any(not self.is_valid_personIndex(personIndex) for personIndex in scheduleSlots):
+        if any(not self.is_valid_slotValue(personIndex) for personIndex in scheduleSlots):
             raise ValueError("all input scheduleSlots must be valid personIndices, empty or nonFill")
         if len(self.slotVector) != len(scheduleSlots):
             raise ValueError("instance scheduleSlots and input scheduleSlots must have the same length")

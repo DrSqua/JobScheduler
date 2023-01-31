@@ -21,9 +21,10 @@ class MultiSchedule(Schedule):
     @classmethod
     def from_empty(cls,
                    personVector: tuple[Person],
-                   scheduleSlots: list[int],
-                   scheduleJobs: tuple[Job]) -> MultiSchedule:
-        pass
+                   jobVector: tuple[Job],
+                   slotDates: tuple[Union[datetime.datetime, datetime.date]],
+                   scheduleSlots: list[int]) -> MultiSchedule:
+        return cls(personVector=personVector, jobVector=jobVector, slotDates=slotDates, scheduleSlots=scheduleSlots)
 
     @classmethod
     def from_linear(cls, *args: LinearSchedule):
@@ -74,7 +75,7 @@ class MultiSchedule(Schedule):
         for slotIndex, slotDate in enumerate(self.slotDateVector):
             result += "\n" + str(slotDate) + " |"
             for jobIndex, j in zip(range(len(self.jobVector)), columnWidth):
-                person = self.get_slot(slotIndex=slotIndex, jobIndex=jobIndex)
+                person = self.as_person(self.__get_slot__(slotIndex=slotIndex, jobIndex=jobIndex))
                 if not person:
                     result += (" {:" + str(j) + "} |").format("None")
                     continue
@@ -96,3 +97,6 @@ class MultiSchedule(Schedule):
         if isinstance(other, MultiSchedule):
             raise ValueError("TODO: Implement this")
         return self
+
+    def __getitem__(self, slotIndex, jobIndex: int = None):
+        return super().__getitem__(slotIndex, jobIndex)
