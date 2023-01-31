@@ -144,6 +144,13 @@ class Schedule:
             raise ValueError("first add a job to the schedule before requesting the jobIndex")
         return self.jobVector.index(job)
 
+    def set_job(self, job: Job, jobIndex: int = 0):
+        if not self.is_valid_jobIndex(jobIndex=jobIndex):
+            raise ValueError(f"jobIndex {jobIndex} is not valid")
+        asList = list(self.jobVector)
+        asList[jobIndex] = job
+        self.jobVector = tuple(asList)
+
     # slot-----------------------------------------------------------------
     def set_slot(self, slotIndex: int, slotValue: Union[int, Person]):
         if isinstance(slotValue, Person):
