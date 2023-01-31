@@ -37,7 +37,7 @@ class MultiSchedule(Schedule):
             return cls(personVector=linearSchedule.personVector,
                        jobVector=tuple([linearSchedule.job]),
                        slotDates=linearSchedule.get_slotDateVector(),
-                       scheduleSlots=linearSchedule.scheduleSlots)
+                       scheduleSlots=linearSchedule.slotVector)
 
         personVectorValid = True
         if args[0] != args[-1]:
@@ -74,7 +74,7 @@ class MultiSchedule(Schedule):
         for slotIndex, slotDate in enumerate(self.slotDateVector):
             result += "\n" + str(slotDate) + " |"
             for jobIndex, j in zip(range(len(self.jobVector)), columnWidth):
-                person = self.get_slot_asPerson(slotIndex=slotIndex, jobIndex=jobIndex)
+                person = self.get_slot(slotIndex=slotIndex, jobIndex=jobIndex)
                 if not person:
                     result += (" {:" + str(j) + "} |").format("None")
                     continue
@@ -88,43 +88,11 @@ class MultiSchedule(Schedule):
         :return:
         """
         if self.personVector != other.personVector:
-            self.rebase_personVector(tuple(set(self.personVector).union(other.personVector)))
+            pass
         if isinstance(other, LinearSchedule):
             # TODO: So, so, much to check
             self.jobVector += tuple([other.job])
-            self.scheduleSlots += other.scheduleSlots
+            self.slotVector += other.slotVector
         if isinstance(other, MultiSchedule):
             raise ValueError("TODO: Implement this")
         return self
-
-    def get_slotVector(self, jobIndex=None):
-        if jobIndex is None:
-            return super().get_slotVector()
-        return self.scheduleSlots[jobIndex * self.slotRowCount:(jobIndex + 1) * self.slotRowCount]
-
-    def is_valid_slotIndex(self, slotIndex: int, jobIndex=None) -> bool:
-        if not jobIndex:
-            return super().is_valid_slotIndex(slotIndex)
-        if 0 <= slotIndex < self.slotRowCount:
-            return True
-        return False
-
-    def get_slot(self, slotIndex: int, jobIndex=None) -> int:
-        if not jobIndex:
-            return super().get_slot(slotIndex)
-        if not self.is_valid_slotIndex(slotIndex, jobIndex):
-            raise ValueError("slotIndex must be valid")
-        return self.scheduleSlots[jobIndex * self.slotRowCount + slotIndex]
-
-    def set_slot(self, slotIndex: int, slotValue, jobIndex=None):
-        if not jobIndex:
-            super().set_slot(slotIndex=slotIndex, slotValue=slotValue)
-            return
-        if not self.is_valid_slotIndex(slotIndex=slotIndex, jobIndex=jobIndex):
-            raise ValueError("slotIndex must be valid")
-        super().set_slot(slotIndex=slotIndex + jobIndex * self.slotRowCount, slotValue=slotValue)
-
-    def get_slot_asPerson(self, slotIndex: int, jobIndex: int = None) -> Person:
-        if not jobIndex:
-            return self.as_person(self.get_slot(slotIndex))
-        return super().get_slot_asPerson(slotIndex=slotIndex+jobIndex*self.slotRowCount)

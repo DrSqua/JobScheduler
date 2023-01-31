@@ -22,20 +22,19 @@ class LinearSchedule(Schedule):
         :param slotDates:
         :param scheduleSlots:
         """
-
+        super().__init__(personVector=personVector, jobVector=tuple([job]), slotDates=slotDates, scheduleSlots=scheduleSlots)
         self.job = job
-        super().__init__(personVector=personVector, jobVector=tuple([self.job]), slotDates=slotDates, scheduleSlots=scheduleSlots)
 
     def __str__(self):
         dateStrLen = 19
 
-        personVector = map(self.as_person, self.scheduleSlots)
-        personNameLengthList = list(map(lambda x: len(x.personName) if x else 0, personVector)) + [len(self.job.jobName)]
+        personVector = map(self.as_person, self.slotVector)
+        personNameLengthList = list(map(lambda x: len(x.personName) if x else 0, personVector)) + [len(self.jobVector[0].jobName)]
         columnWidth = max(personNameLengthList)  # Stores how wide we can format the personName per comumn
 
         # Header
         result: str = dateStrLen*" " + " |"
-        result += (" {:" + str(columnWidth) + "} |").format(self.job.jobName)
+        result += (" {:" + str(columnWidth) + "} |").format(self.jobVector[0].jobName)
 
         # Horizontal dotted line
         result += "\n" + "-" * (dateStrLen + 2 + columnWidth + 2)
@@ -43,7 +42,7 @@ class LinearSchedule(Schedule):
         # Frame
         for slotIndex, slotDate in enumerate(self.slotDateVector):
             result += "\n" + str(slotDate) + " |"
-            person = self.get_slot_asPerson(slotIndex=slotIndex)
+            person = self.get_slot(slotIndex=slotIndex)
             if not person:
                 result += (" {:"+str(columnWidth)+"} |").format("None")
                 continue
@@ -78,14 +77,3 @@ class LinearSchedule(Schedule):
                 indexedScheduleSlots.append(0)
 
         return cls(personVector=personVector, job=job, slotDates=slotDates, scheduleSlots=indexedScheduleSlots)
-
-    def set_job(self, job: Job):
-        self.job = job
-
-"""     Method which should be added, need to work around the circular import problem
-        def __add__(self, other: Union[LinearSchedule, MultiSchedule]) -> MultiSchedule:
-        if isinstance(other, MultiSchedule):
-            return other + self
-        if self.personVector != other.personVector:
-            raise ValueError("TODO: Implement summation for LinearSchedule when personVectors are not equal")
-        return MultiSchedule.from_linear(self, other)"""
