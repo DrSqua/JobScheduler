@@ -58,7 +58,7 @@ class MultiSchedule(Schedule):
         columnWidth: list[int] = []  # Stores how wide we can format the personName per comumn
 
         for jobIndex in range(len(self.jobVector)):
-            slotVector = self.get_slotVector(jobIndex)
+            slotVector = self.get_slotVector(jobIndex=jobIndex)
             personVector = map(self.as_person, slotVector)
             personNameLengthList = list(map(lambda x: len(x.personName) if x else 0, personVector)) + [
                 len(self.as_job(jobIndex).jobName)]

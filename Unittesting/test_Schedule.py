@@ -7,6 +7,7 @@ from Datatypes.Person import Person
 from Datatypes.Job import Job
 
 from JobScheduler.SampleJobScheduler import SampleJobScheduler
+from JobScheduler.WaveFuncCollapseScheduler import WaveFuncCollapseScheduler
 
 from ScheduleGenerators.DateRangeGeneratorFunctions.TimeRangeGenerator import generate_timerange
 from ScheduleGenerators.MultiScheduleGenerator import MultiScheduleGenerator
@@ -26,7 +27,7 @@ class TestMultiSchedule(unittest.TestCase):
     def test_from_empty(self):
         timeRange = generate_timerange(datetime.datetime(2023, 2, 1, 12), datetime.timedelta(hours=1), 10)
         emptyMulti = MultiSchedule.from_empty(personVector=self.personList,
-                                              scheduleSlots=[-1]*len(self.personList)*len(self.jobList),
+                                              scheduleSlots=[-1]*len(timeRange)*len(self.jobList),
                                               slotDates=timeRange,
                                               jobVector=self.jobList)
         self.assertIsNotNone(emptyMulti)
@@ -34,7 +35,7 @@ class TestMultiSchedule(unittest.TestCase):
     def test_setSlot(self):
         timeRange = generate_timerange(datetime.datetime(2023, 2, 1, 12), datetime.timedelta(hours=1), 10)
         emptyMulti = MultiSchedule.from_empty(personVector=self.personList,
-                                              scheduleSlots=[-1] * len(self.personList) * len(self.jobList),
+                                              scheduleSlots=[-1] * len(timeRange) * len(self.jobList),
                                               slotDates=timeRange,
                                               jobVector=self.jobList)
         namen = "RobbeDeHelt", "JorreBeyltiens"
@@ -42,7 +43,10 @@ class TestMultiSchedule(unittest.TestCase):
 
         emptyMulti[0, 0] = index1
         emptyMulti[0, 1] = index2
-        print(emptyMulti)
+
+        generator = WaveFuncCollapseScheduler(emptyMulti)
+        filledSchedule = generator.fill_schedule()
+        print(filledSchedule)
 
     def test_getitem(self):
         pass

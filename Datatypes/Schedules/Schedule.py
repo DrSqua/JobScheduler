@@ -79,9 +79,9 @@ class Schedule:
         if isinstance(slotValue, Person):
             slotValue = self.as_personIndex(slotValue)
         if not self.is_existing_personIndex(slotValue):
-            raise ValueError("slotValue is not valid")
+            raise ValueError(f"slotValue {slotValue} is not valid")
         if not self.is_valid_slotIndex(slotIndex):
-            raise ValueError("slotIndex is not valid")
+            raise ValueError(f"slotIndex {slotIndex} is not valid")
         if not jobIndex:
             self.slotVector[slotIndex] = slotValue
             return
@@ -187,7 +187,7 @@ class Schedule:
             return self.slotVector
         if not self.is_valid_jobIndex(jobIndex=jobIndex):
             raise ValueError("jobIndex is invalid")
-        return self.slotVector[self.slotRowCount:(self.slotRowCount * jobIndex)]
+        return self.slotVector[(self.slotRowCount * jobIndex):(self.slotRowCount * (jobIndex + 1))]
 
     def get_slotVector_as_person(self) -> list[Union[None, Person]]:
         """

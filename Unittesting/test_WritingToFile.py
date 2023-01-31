@@ -41,6 +41,12 @@ class TestWritingToTXT(unittest.TestCase):
                                                    personVector=self.personList)
         multiSchedule = MultiSchedule.from_linear(linearSchedule) + linearSchedule
 
+        namen = "RobbeDeHelt", "JorreBeyltiens"
+        index1, index2 = [person.personName for person in self.personList].index(namen[0]), [person.personName for person in self.personList].index(namen[1])
+
+        multiSchedule[0, 0] = index1
+        multiSchedule[0, 1] = index2
+
         generator = WaveFuncCollapseScheduler(multiSchedule)
         fittedSchedule = generator.fill_schedule()
 

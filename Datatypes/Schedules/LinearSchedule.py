@@ -42,7 +42,7 @@ class LinearSchedule(Schedule):
         # Frame
         for slotIndex, slotDate in enumerate(self.slotDateVector):
             result += "\n" + str(slotDate) + " |"
-            person = self.get_slot(slotIndex=slotIndex)
+            person = self.__get_slot__(slotIndex=slotIndex)
             if not person:
                 result += (" {:"+str(columnWidth)+"} |").format("None")
                 continue

@@ -12,9 +12,10 @@ class WaveFuncCollapseScheduler(JobSchedulingAgent):
         usedValues = []
         if checkSchedule:
             usedValues = list(filter(lambda n: n not in {-1, -2}, self.schedule.get_slotVector()))
-        return [self.schedule.as_personIndex(person) for person in self.schedule.get_personVector() if person not in usedValues]
+        data = [self.schedule.as_personIndex(person) for person in self.schedule.get_personVector() if self.schedule.as_personIndex(person) not in usedValues]
+        return data
 
-    def fill_schedule(self, checkAvailability: bool = False):
+    def fill_schedule(self):
         scheduleAvailabilityList: list = []
         schedule = deepcopy(self.schedule)
 
