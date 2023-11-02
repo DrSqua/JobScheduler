@@ -1,5 +1,6 @@
 import unittest
 import datetime
+from copy import deepcopy
 
 from Datatypes.Person import Person
 from Datatypes.Job import Job
@@ -17,7 +18,7 @@ from ImportExport.ScheduleExporters.ScheduleToTxt import ScheduleToText
 
 class TestWritingToTXT(unittest.TestCase):
     def setUp(self):
-        self.personList = read_person_list("../ImportExport/PersonImporters/PraesidiumEnEducationNamenlijst.txt")
+        self.personList = read_person_list("../ImportExport/PersonImporters/RobbeStopHiermee.txt")
         startTime = datetime.datetime(2023, 1, 30, hour=12)
         endTime = datetime.datetime(2023, 3, 22, hour=12)
         job = Job("Socialmedia")
@@ -32,20 +33,20 @@ class TestWritingToTXT(unittest.TestCase):
         ScheduleToText.schedule_to_txt(self.fittedLinearSchedule, "test_linearToTXT.txt")
 
     def test_writeMultiToFile(self):
-        startTime = datetime.datetime(2023, 1, 30, hour=12)
-        endTime = datetime.datetime(2023, 3, 22, hour=12)
-        job = Job("Post op FB + Verander achtergrond")
-        timeRange = fit_range(startTime=startTime, endTime=endTime, actionCount=len(self.personList)//2)
+        startTime = datetime.datetime(2023, 6, 24, hour=12)
+        endTime = datetime.datetime(2023, 7, 7, hour=12)
+        job = Job("Post op FB")
+        timeRange = fit_range(startTime=startTime, endTime=endTime, actionCount=10)
         linearSchedule = LinearSchedule.from_empty(job=job,
                                                    slotDates=timeRange,
                                                    personVector=self.personList)
-        multiSchedule = MultiSchedule.from_linear(linearSchedule) + linearSchedule
+        multiSchedule = MultiSchedule.from_linear(linearSchedule)
+        linearSchedule = LinearSchedule.from_empty(job=job,
+                                                   slotDates=timeRange,
+                                                   personVector=self.personList)
+        multiSchedule += linearSchedule
+        print(multiSchedule)
 
-        namen = "RobbeDeHelt", "JorreBeyltiens"
-        index1, index2 = [person.personName for person in self.personList].index(namen[0]), [person.personName for person in self.personList].index(namen[1])
-
-        multiSchedule[0, 0] = index1
-        multiSchedule[0, 1] = index2
 
         generator = WaveFuncCollapseScheduler(multiSchedule)
         fittedSchedule = generator.fill_schedule()

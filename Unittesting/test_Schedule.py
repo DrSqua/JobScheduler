@@ -13,7 +13,7 @@ from ScheduleGenerators.DateRangeGeneratorFunctions.TimeRangeGenerator import ge
 from ScheduleGenerators.MultiScheduleGenerator import MultiScheduleGenerator
 
 
-class TestMultiSchedule(unittest.TestCase):
+class TestSchedule(unittest.TestCase):
     def setUp(self):
         nameStrList = ["JonathanFonteyn", "WoutDeSmit", "LiesbethPoppe", "ThorClaessens", "VincentJacobs", "MichaelSchoenmakers", "BryanVanhoudt", "RobbeGevers", "WoutSaenen", "AnneMarieDeLaet", "JarneArnouts",        "MichielVercauteren",        "YorbenJoosen",        "RobbeDeHelt",        "BjornLahey",        "LiesHornikx",        "JorreBeyltiens",        "JonasVerburgh","WannesBrusselmans","CyrianneMintiens"]
         charList = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",

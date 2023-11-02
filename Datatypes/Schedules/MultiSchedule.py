@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Union
 import datetime
+from copy import deepcopy
 
 from Datatypes.Schedules.Schedule import Schedule
 from Datatypes.Schedules.LinearSchedule import LinearSchedule
@@ -40,14 +41,35 @@ class MultiSchedule(Schedule):
                        slotDates=linearSchedule.get_slotDateVector(),
                        scheduleSlots=linearSchedule.slotVector)
 
+        # Check if jobDuration is equal
+
+        # Check if personVectors are equal
         personVectorValid = True
-        if args[0] != args[-1]:
+        if args[0].get_personVector() != args[-1].get_personVector():
             personVectorValid = False
         for first, second in zip(args, args[1:]):
-            if first != second:
+            if first.get_personVector() != second.get_personVector():
                 personVectorValid = False
         if not personVectorValid:
             raise ValueError("TODO: Implement summing LinearSchedules if personVectors are not equal")
+
+        # Check if start and enddate are equal
+        startEndDateValid = True
+        if args[0].get_slotDateVector()[0] != args[-1].get_slotDateVector()[0]:
+            startEndDateValid = False
+        if args[0].get_slotDateVector()[-1] != args[-1].get_slotDateVector()[-1]:
+            startEndDateValid = False
+        if not startEndDateValid:
+            # First we pick the start and end
+            minStartDate = min(schedule.get_slotDateVector()[0] for schedule in args)
+            maxEndDate = max(schedule.get_slotDateVector()[-1] for schedule in args)
+
+            for schedule in args:
+                if schedule.get_slotDateVector()[0] != minStartDate:
+                    pass
+                if schedule.get_slotDateVector()[-1] != maxEndDate:
+                    pass
+
 
     def __str__(self):
         """
@@ -92,8 +114,8 @@ class MultiSchedule(Schedule):
             pass
         if isinstance(other, LinearSchedule):
             # TODO: So, so, much to check
-            self.jobVector += tuple([other.job])
-            self.slotVector += other.slotVector
+            self.jobVector += deepcopy(tuple([other.job]))
+            self.slotVector += deepcopy(other.slotVector)
         if isinstance(other, MultiSchedule):
             raise ValueError("TODO: Implement this")
         return self

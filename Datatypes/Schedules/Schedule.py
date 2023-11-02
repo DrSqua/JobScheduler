@@ -33,6 +33,14 @@ class Schedule:
         return self.__get_slot__(slotIndex=slotIndex, jobIndex=jobIndex)
 
     def __setitem__(self, slotIndexArg: Union[int, Iterable], slotValue: Union[int, Person]):
+        """
+        set item implements for two types of value arguments.
+        A single value (this is the easy part)
+        and a sequence (this is the hard part)
+        :param slotIndexArg:
+        :param slotValue:
+        :return:
+        """
         if isinstance(slotIndexArg, int):
             self.__set_slot__(slotIndex=slotIndexArg, slotValue=slotValue, jobIndex=None)
             return
